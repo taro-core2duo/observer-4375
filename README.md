@@ -103,9 +103,9 @@ tags: ""
 ### 津波情報
 
 津波情報が発表された際にその情報を表示します。  
-![image.png](/public/md/md4.png)
+![image.png](/public/md/md4.png)  
 津波情報発表時刻、津波情報発表地域、津波情報種類、直ちに来襲するか否か、が表示されます。  
-![image.png](/public/md/md5.png)
+![image.png](/public/md/md5.png)  
 津波情報がキャンセルされた場合は上のように表示されます。  
 
 データはp2p地震情報の[JSON API v2](https://www.p2pquake.net/json_api_v2/#/P2P%E5%9C%B0%E9%9C%87%E6%83%85%E5%A0%B1%20API/get_history)を利用しています。  
