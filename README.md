@@ -1,8 +1,3 @@
----
-title: "how to use quake app"
-tags: ""
----
-
 # IF4375
 ### Information from 4375  
 日本の地震観測点数である4375から命名。  
