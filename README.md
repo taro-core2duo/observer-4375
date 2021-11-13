@@ -1,109 +1,116 @@
-*Psst — looking for a more complete solution? Check out [SvelteKit](https://kit.svelte.dev), the official framework for building web applications of all sizes, with a beautiful development experience and flexible filesystem-based routing.*
-
-*Looking for a shareable component template instead? You can [use SvelteKit for that as well](https://kit.svelte.dev/docs#packaging) or the older [sveltejs/component-template](https://github.com/sveltejs/component-template)*
-
+---
+title: "how to use quake app"
+tags: ""
 ---
 
-# svelte app
+# IF4375
+### Information from 4375  
+日本の地震観測点数である4375から命名。  
+地震情報等を表示するwebサイトです。  
+***
+![image.png](https://boostnote.io/api/teams/sHsT4vNs0/files/5361edbbcc175fb07cb4960e282ec0482b183fe82c2df3383fb7637d379356a2-image.png)
+レイアウトは画像の通りです。（デザイン変更の可能性あり） 
 
-This is a project template for [Svelte](https://svelte.dev) apps. It lives at https://github.com/sveltejs/template.
+>## 上段  
 
-To create a new project based on this template using [degit](https://github.com/Rich-Harris/degit):
+### 鉄道遅延情報
+地震情報に関連するものとして、全国の鉄道遅延情報を表示します。
 
-```bash
-npx degit sveltejs/template svelte-app
-cd svelte-app
-```
+鉄道会社名/遅延している路線名（または列車の種類）  
+このような表示になっています。
 
-*Note that you will need to have [Node.js](https://nodejs.org) installed.*
+データは[rti技研のサービス](https://rti-giken.jp/fhc/api/train_tetsudo/)を利用しています。  
+10分に一度自動的に更新されます。  
+データの正しさに関しては保証しかねます。  
 
+>## 中段左
 
-## Get started
+### 最新の地震情報
+日本における地震で最新のものを表示します。  
+上から  
+- 発生時刻
+- 最大震度
+- マグニチュード
+- 震源
+- 震源の深さ
+- 津波の有無
+- 各地の震度（地震が観測された地震観測点の名前）
 
-Install the dependencies...
+となっています。  
 
-```bash
-cd svelte-app
-npm install
-```
+データはp2p地震情報の[JSON API v2](https://www.p2pquake.net/json_api_v2/#/P2P%E5%9C%B0%E9%9C%87%E6%83%85%E5%A0%B1%20API/get_history)を利用しています。  
+データの正しさに関しては保証しかねます。  
 
-...then start [Rollup](https://rollupjs.org):
+>## 中段右
 
-```bash
-npm run dev
-```
+### 最新の地震における震度分布図
+最新の地震における震度分布図を表示します。  
+- 震度1
+<img src="https://boostnote.io/api/teams/sHsT4vNs0/files/42c3c643a64efdc99a11311169e201564b0e6868283e6e4e416879e5ee3f4403-1.png" width="50px">
+- 震度2
+<img src="https://boostnote.io/api/teams/sHsT4vNs0/files/67f1cd1467e4ba06059d72a6278c6c06b55786c12f65bfad333e3051d4d6c505-2.png" width="50px">
+- 震度3
+<img src ="https://boostnote.io/api/teams/sHsT4vNs0/files/36ded389e0a6fced3c8ab99bcfa8179badfb83cd5c8cdd42c10db41df7ca2b08-3.png" width="50px">
+- 震度4
+<img src="https://boostnote.io/api/teams/sHsT4vNs0/files/6976a1b25dc08a5548e6a930deab8a77cfc9cb8679a50bb14b09d7db4ed37e74-4.png" width="50px">
+- 震度5弱
+<img src="https://boostnote.io/api/teams/sHsT4vNs0/files/2c02a45c1b1ef13685d2a1a9936589166a97d0a3e0e880e07cecb80e9b4e90fe-5-.png" width="50px">
+- 震度5強
+<img src="https://boostnote.io/api/teams/sHsT4vNs0/files/8d5503aa58bde66a61b54086d955a3bd1561e7397f03ce760581c3e4256d2d4d-5+.png" width="50px">
+- 震度6弱
+<img src="https://boostnote.io/api/teams/sHsT4vNs0/files/c2671ca4e6ff1decc8b9662d382721e5a248c88f9a7662eb23e4a1ca53ef266d-6-.png" width="50px">
+- 震度6強
+<img src="https://boostnote.io/api/teams/sHsT4vNs0/files/349e61cca5b1370d52fab1d13d2cb30aa3df4975bbc49c309773e89cfa627465-6+.png" width="50px">
+- 震度7
+<img src="https://boostnote.io/api/teams/sHsT4vNs0/files/03858f5afed366557a5893714ec95315cc2bb88e786507b82d02ebb8d30ebf8d-7.png" width="50px">  
+- 震源
+<img src="https://boostnote.io/api/teams/sHsT4vNs0/files/9caf78dfa6b42c78911c00d8098c6b5a11f0e70fab10a986d756b1c929f94bd6-center.png" width="50px"> 
 
-Navigate to [localhost:5000](http://localhost:5000). You should see your app running. Edit a component file in `src`, save it, and reload the page to see your changes.
+上のアイコンで表示されます。
+![image.png](https://boostnote.io/api/teams/sHsT4vNs0/files/ef5737a340e5b10ddba376d2067c2c34dd3f38d4421688e04d1d94cc66f8ac03-image.png)  
+データはp2p地震情報の[JSON API v2](https://www.p2pquake.net/json_api_v2/#/P2P%E5%9C%B0%E9%9C%87%E6%83%85%E5%A0%B1%20API/get_history)を利用しています。  
+データの正しさに関しては保証しかねます。  
 
-By default, the server will only respond to requests from localhost. To allow connections from other computers, edit the `sirv` commands in package.json to include the option `--host 0.0.0.0`.
+>## 下段左
 
-If you're using [Visual Studio Code](https://code.visualstudio.com/) we recommend installing the official extension [Svelte for VS Code](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode). If you are using other editors you may need to install a plugin in order to get syntax highlighting and intellisense.
+### 地震感知情報
+地震感知情報を表示します。  
+ユーザ同士の「揺れた！」という地震感知情報をP2Pネットワークで共有するサービスである「**p2p地震情報**」を利用しています。
+![image.png](https://boostnote.io/api/teams/sHsT4vNs0/files/72582715b4540be2e4ce112f3bbe0c82b0b97afe7e34fc7b4a73234993e8e6ab-image.png)
+- ### レベル
+レベルは「レベル1～レベル4」まであり、地震感知情報の信頼度を表します。  
+- ### 件数
+件数は地震が感知された件数を表します。
+- ### 開始/更新
+地震感知情報が「開始時刻」と「更新時刻」の間に検出されたというのを表します。
+- ### 地名/件数/信頼度
+各地域ごとの地震感知情報を表示します。
+信頼度はAからFまであり、Aが最も高い信頼度になっています。  
 
-## Building and running in production mode
+データはp2p地震情報の[JSON API v2](https://www.p2pquake.net/json_api_v2/#/P2P%E5%9C%B0%E9%9C%87%E6%83%85%E5%A0%B1%20API/get_history)を利用しています。  
+データの正しさに関しては保証しかねます。  
+>## 下段中
 
-To create an optimised version of the app:
+### 直近の地震
+直近の地震を表示します。  
+わずかにデータ反映が遅れる場合があります。  
 
-```bash
-npm run build
-```
+データはp2p地震情報の[JSON API v2](https://www.p2pquake.net/json_api_v2/#/P2P%E5%9C%B0%E9%9C%87%E6%83%85%E5%A0%B1%20API/get_history)を利用しています。  
+データの正しさに関しては保証しかねます。  
 
-You can run the newly built app with `npm run start`. This uses [sirv](https://github.com/lukeed/sirv), which is included in your package.json's `dependencies` so that the app will work when you deploy to platforms like [Heroku](https://heroku.com).
+> ## 下段右
 
+### 津波情報
 
-## Single-page app mode
+津波情報が発表された際にその情報を表示します。  
+![image.png](https://boostnote.io/api/teams/sHsT4vNs0/files/eaecd3c14e485e52ed835846c9b2d57e913869df093a7ab121656da030a0975e-image.png)
+津波情報発表時刻、津波情報発表地域、津波情報種類、直ちに来襲するか否か、が表示されます。
+![image.png](https://boostnote.io/api/teams/sHsT4vNs0/files/f48be687a521d04abf9d27a8a7f6b8b614234a7f205632f27dbd328b187f5fa4-image.png)
+津波情報がキャンセルされた場合は上のように表示されます。  
 
-By default, sirv will only respond to requests that match files in `public`. This is to maximise compatibility with static fileservers, allowing you to deploy your app anywhere.
-
-If you're building a single-page app (SPA) with multiple routes, sirv needs to be able to respond to requests for *any* path. You can make it so by editing the `"start"` command in package.json:
-
-```js
-"start": "sirv public --single"
-```
-
-## Using TypeScript
-
-This template comes with a script to set up a TypeScript development environment, you can run it immediately after cloning the template with:
-
-```bash
-node scripts/setupTypeScript.js
-```
-
-Or remove the script via:
-
-```bash
-rm scripts/setupTypeScript.js
-```
-
-If you want to use `baseUrl` or `path` aliases within your `tsconfig`, you need to set up `@rollup/plugin-alias` to tell Rollup to resolve the aliases. For more info, see [this StackOverflow question](https://stackoverflow.com/questions/63427935/setup-tsconfig-path-in-svelte).
-
-## Deploying to the web
-
-### With [Vercel](https://vercel.com)
-
-Install `vercel` if you haven't already:
-
-```bash
-npm install -g vercel
-```
-
-Then, from within your project folder:
-
-```bash
-cd public
-vercel deploy --name my-project
-```
-
-### With [surge](https://surge.sh/)
-
-Install `surge` if you haven't already:
-
-```bash
-npm install -g surge
-```
-
-Then, from within your project folder:
-
-```bash
-npm run build
-surge public my-project.surge.sh
-```
+データはp2p地震情報の[JSON API v2](https://www.p2pquake.net/json_api_v2/#/P2P%E5%9C%B0%E9%9C%87%E6%83%85%E5%A0%B1%20API/get_history)を利用しています。  
+データの正しさに関しては保証しかねます。  
+***
+当サイトは気象庁の情報をp2p地震情報のJSON API v2を介して利用しています。  
+当サイトは鉄道comの情報をrti技研のサービスを介して利用しています。  
+当サイトの利用によるいかなる損害についても、一切の責任を負いません。また、情報の正確性も一切保証しません。

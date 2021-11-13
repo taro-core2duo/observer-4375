@@ -934,8 +934,8 @@
                     <p>以下の津波情報が発表されました</p>
                     {#each tsunami.areas as areas}
                         <div>
-                            <p style="font-size:25px;">{areas.name}</p>
-                            <p style="display:inline-block; font-size:20px;">{tsunami_type[areas.grade]}</p>
+                            <p style="font-size:25px; margin-bottom:5px;">{areas.name}</p>
+                            <p style="display:inline-block; font-size:20px; color:{convertColor[areas.grade]}">{tsunami_type[areas.grade]}</p>
                             {#if areas.immediate == true}
                                 <p style="display:inline-block;">直ちに来襲</p>
                             {:else if areas.immediate == false}
@@ -984,7 +984,7 @@
     }
     .EEWDetection{
         grid-area:1/1/2/5;
-        border-left:5px solid #CF6679;
+        border-left:5px solid #03DAC5;
         box-shadow: rgba(0, 0, 0, 0.4) 0px 7px 29px 0px;
         display: flex;
         align-items: center;
@@ -992,7 +992,7 @@
     .detail{
         grid-area:2/1/3/2;
         overflow-y: scroll;
-        border-left:5px solid #CF6679;
+        border-left:5px solid #03DAC5;
         box-shadow: rgba(0, 0, 0, 0.4) 0px 7px 29px 0px; 
     }
     .detail div p{
@@ -1030,7 +1030,7 @@
     .UserQuake{
         grid-area:3/1/4/3;
         overflow-y: scroll;
-        border-left:5px solid #CF6679;
+        border-left:5px solid #03DAC5;
         box-shadow: rgba(0, 0, 0, 0.4) 0px 7px 29px 0px; 
     }
     .UserQuake div div{
@@ -1068,7 +1068,7 @@
     .other{
         grid-area:3/4/4/5;
         overflow-y: scroll;
-        border-left:5px solid #CF6679;
+        border-left:5px solid #03DAC5;
         box-shadow: rgba(0, 0, 0, 0.4) 0px 7px 29px 0px; 
     }
     .noTsunami{

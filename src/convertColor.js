@@ -20,5 +20,9 @@ export const convertColor = {
     "D": "#4E9F3D",
     "C": "#FFAC41",
     "B": "#ED5107",
-    "A": "#C70039"
+    "A": "#C70039",
+    "MajorWarning": "#C800FF",
+    "Warning": "#FF2800",
+    "Watch": "#FAF500",
+    "Unknown": "#ffffff"
 }
