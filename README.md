@@ -46,28 +46,28 @@ tags: ""
 ### 最新の地震における震度分布図
 最新の地震における震度分布図を表示します。  
 - 震度1
-<img src="/scale/1.png" width="50px">
+<img src="/public/scale/1.png" width="50px">
 - 震度2
-<img src="/scale/2.png" width="50px">
+<img src="/public/scale/2.png" width="50px">
 - 震度3
-<img src="/scale/3.png" width="50px">
+<img src="/public/scale/3.png" width="50px">
 - 震度4
-<img src="/scale/4.png" width="50px">
+<img src="/public/scale/4.png" width="50px">
 - 震度5弱
-<img src="/scale/5-.png" width="50px">
+<img src="/public/scale/5-.png" width="50px">
 - 震度5強
-<img src="/scale/5+.png" width="50px">
+<img src="/public/scale/5+.png" width="50px">
 - 震度6弱
-<img src="/scale/6-.png" width="50px">
+<img src="/public/scale/6-.png" width="50px">
 - 震度6強
-<img src="/scale/6+.png" width="50px">
+<img src="/public/scale/6+.png" width="50px">
 - 震度7
-<img src="/scale/7.png" width="50px">  
+<img src="/public/scale/7.png" width="50px">  
 - 震源
-<img src="/scale/center.png" width="50px"> 
+<img src="/public/scale/center.png" width="50px"> 
 
 上のアイコンで表示されます。
-![image.png](/md/md2.png)  
+![image.png](/public/md/md2.png)  
 データはp2p地震情報の[JSON API v2](https://www.p2pquake.net/json_api_v2/#/P2P%E5%9C%B0%E9%9C%87%E6%83%85%E5%A0%B1%20API/get_history)を利用しています。  
 データの正しさに関しては保証しかねます。  
 
@@ -76,7 +76,7 @@ tags: ""
 ### 地震感知情報
 地震感知情報を表示します。  
 ユーザ同士の「揺れた！」という地震感知情報をP2Pネットワークで共有するサービスである「**p2p地震情報**」を利用しています。
-![image.png](/md/md3.png)
+![image.png](/public/md/md3.png)
 - ### レベル
 レベルは「レベル1～レベル4」まであり、地震感知情報の信頼度を表します。  
 - ### 件数
@@ -103,9 +103,9 @@ tags: ""
 ### 津波情報
 
 津波情報が発表された際にその情報を表示します。  
-![image.png](/md/md4.png)
+![image.png](/public/md/md4.png)
 津波情報発表時刻、津波情報発表地域、津波情報種類、直ちに来襲するか否か、が表示されます。
-![image.png](/md/md5.png)
+![image.png](/public/md/md5.png)
 津波情報がキャンセルされた場合は上のように表示されます。  
 
 データはp2p地震情報の[JSON API v2](https://www.p2pquake.net/json_api_v2/#/P2P%E5%9C%B0%E9%9C%87%E6%83%85%E5%A0%B1%20API/get_history)を利用しています。  
