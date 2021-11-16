@@ -26,8 +26,8 @@
         mapID: "map",
         tilelayers: [
             {
-                url: "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png",
-                attribution: `&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>`,
+                url: "https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png",
+                attribution: `Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`,
             }
         ],
     }
@@ -332,6 +332,14 @@
                 }
             }
         }
+        for(let i = 0; i < userQuakeJson.length; i++){
+            if(userQuakeJson[i].confidence !== 0){
+                judgeZero = i
+                break
+            }
+            judgeZero = i
+        }
+        console.log(judgeZero)
     };
 
     const get = () => {
@@ -631,8 +639,17 @@
                 }
             }
         }
+        for(let i = 0; i < userQuakeJson.length; i++){
+            if(userQuakeJson[i].confidence !== 0){
+                judgeZero = i
+                break
+            }
+            judgeZero = i
+        }
+        console.log(judgeZero)
     };
 
+    let judgeZero
     let Rjson;
     let lastQuakeJson;
     let userQuakeJson;
@@ -890,27 +907,31 @@
         </div>        
     </div>
     <div class="UserQuake">
-        {#each userQuakeJson as userQuake}
-            {#if userQuake.confidence !== 0}
-                <div style=" padding-bottom:5px; border-bottom:1px solid #444444;">
-                    <div style="font-size:25px;">
-                        <p style="color:{convertColor[userQuake.confLevel]}; font-weight:600;">{userQuake.confLevel}</p>
-                        <p>件数{userQuake.count}</p>
+        {#if judgeZero == 19}
+            <div class="noTsunami">地震感知情報無し</div>
+        {:else}
+            {#each userQuakeJson as userQuake}
+                {#if userQuake.confidence !== 0}
+                    <div style=" padding-bottom:5px; border-bottom:1px solid #444444;">
+                        <div style="font-size:25px;">
+                            <p style="color:{convertColor[userQuake.confLevel]}; font-weight:600;">{userQuake.confLevel}</p>
+                            <p>件数{userQuake.count}</p>
+                        </div>
+                        <p><span style="font-size:12px; margin-right:5px;">開始</span>{userQuake.started_at}</p>
+                        <p><span style="font-size:12px; margin-right:5px;">更新</span>{userQuake.updated_at}</p>
+                        {#each userQuake.area_conf as eachArea}
+                            {#if (eachArea.length !== 0)}
+                                <div>
+                                    <p style="color:{convertColor[eachArea[1].display]}">{eachArea[2]}</p>
+                                    <p style="color:{convertColor[eachArea[1].display]}"><span style="font-size:12px;">件数</span>{eachArea[1].count}</p>
+                                    <p style="color:{convertColor[eachArea[1].display]}"><span style="font-size:12px;">信頼度</span>{eachArea[1].display}</p>
+                                </div>
+                            {/if}
+                        {/each}
                     </div>
-                    <p><span style="font-size:12px; margin-right:5px;">開始</span>{userQuake.started_at}</p>
-                    <p><span style="font-size:12px; margin-right:5px;">更新</span>{userQuake.updated_at}</p>
-                    {#each userQuake.area_conf as eachArea}
-                        {#if (eachArea.length !== 0)}
-                            <div>
-                                <p style="color:{convertColor[eachArea[1].display]}">{eachArea[2]}</p>
-                                <p style="color:{convertColor[eachArea[1].display]}"><span style="font-size:12px;">件数</span>{eachArea[1].count}</p>
-                                <p style="color:{convertColor[eachArea[1].display]}"><span style="font-size:12px;">信頼度</span>{eachArea[1].display}</p>
-                            </div>
-                        {/if}
-                    {/each}
-                </div>
-            {/if}
-        {/each}
+                {/if}
+            {/each}
+        {/if}
     </div>
     <div class="RecentQuake" id="RecentQuake">
         {#each lastQuakeJson as recentQuake}
