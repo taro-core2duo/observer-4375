@@ -6,7 +6,10 @@
     import { epsp_area } from "./epsp-area"
     import { convertColor } from "./convertColor"
     import { tsunami_type } from "./tsunami-type"
-
+    import { changeArray } from "./changeArray"
+    import { convertScales } from "./convertScales"
+    import { confidence} from "./confidence"
+    import { sample1 } from "./sample1"
 
     console.log(quakeScale[10])
     let pointLength = pointData.length
@@ -146,6 +149,10 @@
         console.log(quake)
         let r = 0
         //if( lastJson !== apiHttps.responseText ){
+            Rjson[r].points.sort(function(first,second){
+                return first.scale - second.scale
+            })
+            console.log(Rjson[r])
             if(Rjson[r].code == 551 && quake[r].type == "DetailScale"){
                 options.center = [quake[r].lat, quake[r].lon]
                 options.zoom = 9
@@ -172,7 +179,7 @@
                         options.markers[q].icon = {}
                         options.markers[q].icon.iconUrl = "/scale/5-.png"
                     }else if(quake[r].points[q].changedScale == "5強"){
-                        ptions.markers[q].icon = {}
+                        options.markers[q].icon = {}
                         options.markers[q].icon.iconUrl = "/scale/5+.png"
                     }else if(quake[r].points[q].changedScale == "6弱"){
                         options.markers[q].icon = {}
@@ -479,7 +486,7 @@
                         options.markers[q].icon = {}
                         options.markers[q].icon.iconUrl = "/scale/5-.png"
                     }else if(quake[r].points[q].changedScale == "5強"){
-                        ptions.markers[q].icon = {}
+                        options.markers[q].icon = {}
                         options.markers[q].icon.iconUrl = "/scale/5+.png"
                     }else if(quake[r].points[q].changedScale == "6弱"){
                         options.markers[q].icon = {}
@@ -657,7 +664,6 @@
     let lastJson;
     let apiHttps;
     let tsunamiJson;
-    let trainInfoJson;
     try{
         apiHttps = new XMLHttpRequest();
         apiHttps.open("GET", "https://api.p2pquake.net/v2/history?codes=551", false);
@@ -715,24 +721,11 @@
         tsunami.send();
         const tsunamiLog = tsunami.responseText;
         tsunamiJson = JSON.parse(tsunamiLog);
-
-        const trainInfo = new XMLHttpRequest();
-        trainInfo.open("GET", "https://tetsudo.rti-giken.jp/free/delay.json", false);
-        trainInfo.onreadystatechange = function(){
-            if(this.readyState === 4 && this.status === 200){
-                console.log("success")
-            }else{
-                console.log("error")
-                setTimeout(window.location.reload(), 3000)
-            }
-        }
-        trainInfo.send();
-        const trainInfoLog = trainInfo.responseText;
-        trainInfoJson = JSON.parse(trainInfoLog);
     }catch(e){
         setTimeout(window.location.reload(), 3000)
     };
-    
+
+    Rjson[0] = sample1
     getFirst();
     setInterval(function(){
         try{
@@ -749,13 +742,14 @@
             lastQuakeJson = JSON.parse(logQuakes);
             
             const tsunami = new XMLHttpRequest();
-            tsunami.open("GET", "https://api.p2pquake.net/v2/history?codes=522", false);
+            tsunami.open("GET", "https://api.p2pquake.net/v2/jma/tsunami?limit=5", false);
             tsunami.send();
             const tsunamiLog = tsunami.responseText;
             tsunamiJson = JSON.parse(tsunamiLog);
         }catch(e){
             console.log(e)
         };
+        Rjson[0] = sample1
         get()
     },20000);
 
@@ -772,18 +766,13 @@
         get()
     },10000);
 
-    setInterval(function(){
-        try{
-            const trainInfo = new XMLHttpRequest();
-            trainInfo.open("GET", "https://tetsudo.rti-giken.jp/free/delay.json", false);
-            trainInfo.send();
-            const trainInfoLog = trainInfo.responseText;
-            trainInfoJson = JSON.parse(trainInfoLog);
-        }catch(e){
-            console.log(e)
-        };
-    }, 600000);
-
+    let nowDate;
+    const getDate = () => {
+        nowDate = new Date().toLocaleString().replace(/\/|:/g,"")
+    }
+    setInterval( getDate() , 1000 )
+    console.log(nowDate)
+    
     onMount(() => {
         const RecentQuake = document.getElementById("RecentQuake")
         const firstChild = RecentQuake.firstChild
@@ -791,321 +780,475 @@
     })
 </script>
 
-
 <div class="parent">
-    <div class="EEWDetection">
-        <div style="font-size:20px; width:130px; ;flex-shrink: 0;">鉄道遅延情報</div>
-        <div style=" overflow-x:scroll; height:43px; white-space: nowrap; margin:0;">
-            {#each trainInfoJson as train }
-            <div style="display:inline-block;margin-bottom:0px; margin-top:15px;" class="info">{train.company}/{train.name}</div>
+    <div class="logo contents"></div>
+    <div class="EEW-detection contents">
+        <div class="EEW-detection-left contents-left">
+            <div class="EEW-detection-left-explanation contents-left-explanation">
+                <div class="EEW-detection-left-explanation-ja contents-left-explanation-ja">地震感知情報</div>
+                <div class="EEW-detection-left-explanation-en contents-left-explanation-en">earthquake<br>ditection</div>
+            </div>
+        </div>
+        <div class="EEW-detection-right contents-right">
+            {#if userQuakeJson[1].confidence !== 0}
+            {#if nowDate >= userQuakeJson[0].updated_at}
+            <div>
+                <div>{userQuakeJson[0].updated_at}</div>
+                <div>地震発生の可能性</div>
+                <div>
+                    該当地域
+                    {#each confidence as conf}
+                    {#each userQuakeJson[0].area_conf as eachArea}
+                    {#if eachArea[1].display = conf}
+                    <div>{eachArea[2]}</div>
+                    {/if}
+                    {/each}
+                    {/each}
+                </div>
+            </div>
+            {/if}
+            {:else}
+            <div class="EEW-detection-right-noninfomation">情報なし</div>
+            {/if}
+        </div>
+    </div>
+    <div class="recent-quake contents">
+        <div class="recent-quake-left contents-left">
+            <div class="recent-quake-left-explanation contents-left-explanation">
+                <div class="recent-quake-left-explanation-ja contents-left-explanation-ja">最新の地震</div>
+                <div class="recent-quake-left-explanation-en contents-left-explanation-en">rececnt<br>earthquake</div>
+            </div>
+        </div>
+        <div class="recent-quake-right contents-right">
+            {#if (quake[0].type == "DetailScale")}
+            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{convertColor[Rjson[0].earthquake.maxScale][0]}; color:{convertColor[Rjson[0].earthquake.maxScale][1]};">{quake[0].maxScale}</div>
+            <div class="recent-quake-right-info recent-quake-right-contents">
+                <div class="recent-quake-right-info-time recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-time-title-ja recent-quake-right-info-contents-title-ja">時刻</div>
+                    <div class="recent-quake-right-info-time-title-en recent-quake-right-info-contents-title-en">time</div>
+                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{quake[0].time}</div>
+                </div>
+                <div class="recent-quake-right-info-intensity recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-intensity-title-ja recent-quake-right-info-contents-title-ja">最大震度</div>
+                    <div class="recent-quake-right-info-intensity-title-en recent-quake-right-info-contents-title-en">max intensity</div>
+                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{quake[0].maxScale}</div>
+                </div>
+                <div class="recent-quake-right-info-magunitude recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-magunitude-title-ja recent-quake-right-info-contents-title-ja">マグニチュード</div>
+                    <div class="recent-quake-right-info-magunitude-title-en recent-quake-right-info-contents-title-en">magunitude</div>
+                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{quake[0].magnitude}</div>
+                </div>
+                <div class="recent-quake-right-info-hypocenter recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-hypocenter-title-ja recent-quake-right-info-contents-title-ja">震源</div>
+                    <div class="recent-quake-right-info-hypocenter-title-en recent-quake-right-info-contents-title-en">hypocenter</div>
+                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">{quake[0].location}</div>
+                </div>
+                <div class="recent-quake-right-info-depth recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-depth-title-ja recent-quake-right-info-contents-title-ja">深さ</div>
+                    <div class="recent-quake-right-info-depth-title-en recent-quake-right-info-contents-title-en">depth of the hypocenter</div>
+                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">約{quake[0].depth}km</div>
+                </div>
+                <div class="recent-quake-right-info-tsunami recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-tsunami-title-ja recent-quake-right-info-contents-title-ja">津波</div>
+                    <div class="recent-quake-right-info-tsunami-title-en recent-quake-right-info-contents-title-en">possibility of tsunami</div>
+                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{quake[0].domesticTsunami}</div>
+                </div>
+                <div class="recent-quake-right-info-area recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-area-title-ja recent-quake-right-info-contents-title-ja">各地の震度</div>
+                    <div class="recent-quake-right-info-area-title-en recent-quake-right-info-contents-title-en">intensity in each area</div>
+                    <div class="recent-quake-right-info-area-area recent-quake-right-info-contents-content">
+                        {#each changeArray as change}
+                        {#if quake[0].arrayScale[change].length > 0}
+                        <div class="recent-quake-right-info-area-area-intencity">{convertScales[change]}</div>
+                        {#each quake[0].arrayScale[change] as location}
+                        <div class="recent-quake-right-info-area-area-name">{location}</div>
+                        {/each}
+                        {/if}
+                        {/each}
+                    </div>
+                </div>
+            </div>
+            {:else if (quake[0].type == "Destination")}
+            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{convertColor[Rjson[0].earthquake.maxScale][0]}; color:{convertColor[Rjson[0].earthquake.maxScale][1]};">{quake[0].maxScale}</div>
+            <div class="recent-quake-right-info recent-quake-right-contents">
+                <div class="recent-quake-right-info-time recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-time-title-ja recent-quake-right-info-contents-title-ja">時刻</div>
+                    <div class="recent-quake-right-info-time-title-en recent-quake-right-info-contents-title-en">time</div>
+                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{quake[0].time}</div>
+                </div>
+                <div class="recent-quake-right-info-intensity recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-intensity-title-ja recent-quake-right-info-contents-title-ja">最大震度</div>
+                    <div class="recent-quake-right-info-intensity-title-en recent-quake-right-info-contents-title-en">max intensity</div>
+                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{quake[1].maxScale}</div>
+                </div>
+                <div class="recent-quake-right-info-magunitude recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-magunitude-title-ja recent-quake-right-info-contents-title-ja">マグニチュード</div>
+                    <div class="recent-quake-right-info-magunitude-title-en recent-quake-right-info-contents-title-en">magunitude</div>
+                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{quake[0].magnitude}</div>
+                </div>
+                <div class="recent-quake-right-info-hypocenter recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-hypocenter-title-ja recent-quake-right-info-contents-title-ja">震源</div>
+                    <div class="recent-quake-right-info-hypocenter-title-en recent-quake-right-info-contents-title-en">hypocenter</div>
+                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">{quake[0].name}</div>
+                </div>
+                <div class="recent-quake-right-info-depth recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-depth-title-ja recent-quake-right-info-contents-title-ja">深さ</div>
+                    <div class="recent-quake-right-info-depth-title-en recent-quake-right-info-contents-title-en">depth of the hypocenter</div>
+                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">約{quake[0].depth}km</div>
+                </div>
+                <div class="recent-quake-right-info-tsunami recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-tsunami-title-ja recent-quake-right-info-contents-title-ja">津波</div>
+                    <div class="recent-quake-right-info-tsunami-title-en recent-quake-right-info-contents-title-en">possibility of tsunami</div>
+                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{quake[0].domesticTsunami}</div>
+                </div>
+                <div class="recent-quake-right-info-area recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-area-title-ja recent-quake-right-info-contents-title-ja">各地の震度</div>
+                    <div class="recent-quake-right-info-area-title-en recent-quake-right-info-contents-title-en">intensity in each area</div>
+                    <div class="recent-quake-right-info-area-area recent-quake-right-info-contents-content">調査中</div>
+                </div>
+            </div>
+            {:else if (quake[0].type == "ScalePrompt")}
+            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{convertColor[Rjson[0].earthquake.maxScale][0]}; color:{convertColor[Rjson[0].earthquake.maxScale][1]};">{quake[0].maxScale}</div>
+            <div class="recent-quake-right-info recent-quake-right-contents">
+                <div class="recent-quake-right-info-time recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-time-title-ja recent-quake-right-info-contents-title-ja">時刻</div>
+                    <div class="recent-quake-right-info-time-title-en recent-quake-right-info-contents-title-en">time</div>
+                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{quake[0].time}</div>
+                </div>
+                <div class="recent-quake-right-info-intensity recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-intensity-title-ja recent-quake-right-info-contents-title-ja">最大震度</div>
+                    <div class="recent-quake-right-info-intensity-title-en recent-quake-right-info-contents-title-en">max intensity</div>
+                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{quake[1].maxScale}</div>
+                </div>
+                <div class="recent-quake-right-info-magunitude recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-magunitude-title-ja recent-quake-right-info-contents-title-ja">マグニチュード</div>
+                    <div class="recent-quake-right-info-magunitude-title-en recent-quake-right-info-contents-title-en">magunitude</div>
+                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">調査中</div>
+                </div>
+                <div class="recent-quake-right-info-hypocenter recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-hypocenter-title-ja recent-quake-right-info-contents-title-ja">震源</div>
+                    <div class="recent-quake-right-info-hypocenter-title-en recent-quake-right-info-contents-title-en">hypocenter</div>
+                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">調査中</div>
+                </div>
+                <div class="recent-quake-right-info-depth recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-depth-title-ja recent-quake-right-info-contents-title-ja">深さ</div>
+                    <div class="recent-quake-right-info-depth-title-en recent-quake-right-info-contents-title-en">depth of the hypocenter</div>
+                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">調査中</div>
+                </div>
+                <div class="recent-quake-right-info-tsunami recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-tsunami-title-ja recent-quake-right-info-contents-title-ja">津波</div>
+                    <div class="recent-quake-right-info-tsunami-title-en recent-quake-right-info-contents-title-en">possibility of tsunami</div>
+                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">調査中</div>
+                </div>
+                <div class="recent-quake-right-info-area recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-area-title-ja recent-quake-right-info-contents-title-ja">各地の震度</div>
+                    <div class="recent-quake-right-info-area-title-en recent-quake-right-info-contents-title-en">intensity in each area</div>
+                    <div class="recent-quake-right-info-area-area recent-quake-right-info-contents-content">調査中</div>
+                </div>
+            </div>
+            {/if}
+        </div>
+    </div>
+    <div class="distribution contents">
+        <div class="distribution-left contents-left">
+            <div class="distribution-left-explanation contents-left-explanation">
+                <div class="distribution-left-explanation-ja contents-left-explanation-ja">震度分布</div>
+                <div class="distribution-left-explanation-en contents-left-explanation-en">rececnt<br>earthquake's<br>intensity<br>distribution</div>
+            </div>
+        </div>
+        <div class="distribution-right contents-right">
+            <div class="distribution-right-map">
+                <Map {options}></Map>
+            </div>
+        </div>
+    </div>
+    <div class="past-quake contents">
+        <div class="past-quake-left contents-left">
+            <div class="past-quake-left-explanation contents-left-explanation">
+                <div class="past-quake-left-explanation-ja contents-left-explanation-ja">過去の地震</div>
+                <div class="past-quake-left-explanation-en contents-left-explanation-en">rececnt<br>earthquake</div>
+            </div>
+        </div>
+        <div class="past-quake-right contents-right" id="RecentQuake">
+            {#each lastQuakeJson as recentQuake}
+            <div class="past-quake-right-each-info">
+                <div class="past-quake-right-each-info1">
+                    <div class="past-quake-right-each-info1-time">{recentQuake.earthquake.time}</div>
+                    <div class="past-quake-right-each-info1-hypocenter">{recentQuake.earthquake.hypocenter.name}</div>
+                </div>
+                <div class="past-quake-right-each-info2">
+                    <div class="past-quake-right-each-info2-magunitude"><span style="font-size:20px;">M</span>{recentQuake.earthquake.hypocenter.magnitude}</div>
+                </div>
+                <div class="past-quake-right-each-info3">
+                    <div class="past-quake-right-each-info3-inner" style="background-color:{convertColor[recentQuake.earthquake.maxScale][0]}; color:{convertColor[recentQuake.earthquake.maxScale][1]};"><span style="font-size:12px;">震度</span>{quakeScale[recentQuake.earthquake.maxScale]}</div>
+                </div>                
+            </div>
             {/each}
         </div>
     </div>
-    <div class="detail">
-        {#if (quake[0].type == "DetailScale")}
-            <div style="font-size:25px;"><p>{quake[0].time}</p><p>発生</p></div>
-            <div><p class="small">最大震度</p><p class="num">{quake[0].maxScale}</p></div>
-            <div><p class="small">マグニチュード</p><p class="num">{quake[0].magnitude}</p></div>
-            <div><p class="small">震源</p><p class="any">{quake[0].location}</p></div>
-            <div><p class="small">深さ</p><p class="any">約{quake[0].depth}km</p></div>
-            <div><p class="small">津波</p><p class="any">{quake[0].domesticTsunami}</p></div>
-            <div class="scales">
-                <p class="small" style="padding-top:29.6px; padding-bottom:20px; display:inline-block">各地の震度</p>
-                    {#if quake[0].arrayScale[8].length > 0}
-                        <p class="sindo" style="border-bottom:2px solid #FF1E56;">震度7</p>
-                        <div>
-                            {#each quake[0].arrayScale[8] as scales}
-                                <p>{scales}</p>
-                            {/each}
-                        </div>
-                    {/if}
-                    {#if quake[0].arrayScale[7].length > 0}
-                        <p class="sindo" style="border-bottom:2px solid #FF8BA0;">震度6強</p>
-                        <div>
-                            {#each quake[0].arrayScale[7] as scales}
-                                <p>{scales}</p>
-                            {/each}
-                        </div>
-                    {/if}
-                    {#if quake[0].arrayScale[6].length > 0}
-                        <p class="sindo" style="border-bottom:2px solid #FF8BA0;">震度6弱</p>
-                        <div>
-                            {#each quake[0].arrayScale[6] as scales}
-                                <p>{scales}</p>
-                            {/each}
-                        </div>
-                    {/if}
-                    {#if quake[0].arrayScale[5].length > 0}
-                        <p class="sindo" style="border-bottom:2px solid #C70039;">震度5強</p>
-                        <div>
-                            {#each quake[0].arrayScale[5] as scales}
-                                <p>{scales}</p>
-                            {/each}
-                        </div>
-                    {/if}
-                    {#if quake[0].arrayScale[4].length > 0}
-                        <p class="sindo" style="border-bottom:2px solid #C70039;">震度5弱</p>
-                        <div>
-                            {#each quake[0].arrayScale[4] as scales}
-                                <p>{scales}</p>
-                            {/each}
-                        </div>
-                    {/if}
-                    {#if quake[0].arrayScale[3].length > 0}
-                        <p class="sindo" style="border-bottom:2px solid #ED5107;">震度4</p>
-                        <div>
-                            {#each quake[0].arrayScale[3] as scales}
-                                <p>{scales}</p>
-                            {/each}
-                        </div>
-                    {/if}
-                    {#if quake[0].arrayScale[2].length > 0}
-                        <p class="sindo" style="border-bottom:2px solid #FFAC41;">震度3</p>
-                        <div>
-                            {#each quake[0].arrayScale[2] as scales}
-                                <p>{scales}</p>
-                            {/each}
-                        </div>
-                    {/if}
-                    {#if quake[0].arrayScale[1].length > 0}
-                        <p class="sindo" style="border-bottom:2px solid #4E9F3D;">震度2</p>
-                        <div>
-                            {#each quake[0].arrayScale[1] as scales}
-                                <p>{scales}</p>
-                            {/each}
-                        </div>
-                    {/if}
-                    {#if quake[0].arrayScale[0].length > 0}
-                        <p class="sindo" style="border-bottom:2px solid #BBE1FA;">震度1</p>
-                        <div>
-                            {#each quake[0].arrayScale[0] as scales}
-                                <p>{scales}</p>
-                            {/each}
-                        </div>
-                    {/if}
+    <div class="tsunami contents">
+        <div class="tsunami-left contents-left">
+            <div class="tsunami-left-explanation contents-left-explanation">
+                <div class="tsunami-left-explanation-ja contents-left-explanation-ja">津波情報</div>
+                <div class="tsunami-left-explanation-en contents-left-explanation-en">information of<br>tsunami</div>
             </div>
-        {:else if (quake[0].type == "Destination")}
-            <div style="font-size:25px;"><p>{quake[0].time}</p><p>発生</p></div>
-            <div><p class="small">最大震度</p><p class="num">{quake[1].maxScale}</p></div>
-            <div><p class="small">マグニチュード</p><p class="num">{quake[0].magnitude}</p></div>
-            <div><p class="small">震源</p><p class="any">{quake[0].name}</p></div>
-            <div><p class="small">深さ</p><p class="any">約{quake[0].depth}km</p></div>
-            <div><p class="small">津波</p><p class="any">{quake[0].domesticTsunami}</p></div>
-            <div><p class="small">各地の震度</p><p  style="font-size:30px; padding-top:20px;">調査中</p></div>
-        {:else if (quake[0].type == "ScalePrompt")}
-            <div style="font-size:25px;"><p>{quake[0].time}</p><p>発生</p></div>
-            <div><p class="small">最大震度</p><p class="num">{quake[0].maxScale}</p></div>
-            <div><p class="small">マグニチュード</p><p class="num" style="font-size:30px;">調査中</p></div>
-            <div><p class="small">震源</p><p class="any">調査中</p></div>
-            <div><p class="small">深さ</p><p class="any">調査中</p></div>
-            <div><p class="small">津波</p><p class="any">調査中</p></div>
-            <div><p class="small">各地の震度</p><p  style="font-size:30px; padding-top:20px;">調査中</p></div>
-        {/if}
-    </div>
-    <div class="mapParent">
-        <div class="map">
-            <Map {options} id="map"></Map>
-        </div>        
-    </div>
-    <div class="UserQuake">
-        {#if judgeZero == 19}
-            <div class="noTsunami">地震感知情報無し</div>
-        {:else}
-            {#each userQuakeJson as userQuake}
-                {#if userQuake.confidence !== 0}
-                    <div style=" padding-bottom:5px; border-bottom:1px solid #444444;">
-                        <div style="font-size:25px;">
-                            <p style="color:{convertColor[userQuake.confLevel]}; font-weight:600;">{userQuake.confLevel}</p>
-                            <p>件数{userQuake.count}</p>
-                        </div>
-                        <p><span style="font-size:12px; margin-right:5px;">開始</span>{userQuake.started_at}</p>
-                        <p><span style="font-size:12px; margin-right:5px;">更新</span>{userQuake.updated_at}</p>
-                        {#each userQuake.area_conf as eachArea}
-                            {#if (eachArea.length !== 0)}
-                                <div>
-                                    <p style="color:{convertColor[eachArea[1].display]}">{eachArea[2]}</p>
-                                    <p style="color:{convertColor[eachArea[1].display]}"><span style="font-size:12px;">件数</span>{eachArea[1].count}</p>
-                                    <p style="color:{convertColor[eachArea[1].display]}"><span style="font-size:12px;">信頼度</span>{eachArea[1].display}</p>
-                                </div>
-                            {/if}
-                        {/each}
-                    </div>
-                {/if}
-            {/each}
-        {/if}
-    </div>
-    <div class="RecentQuake" id="RecentQuake">
-        {#each lastQuakeJson as recentQuake}
-            <div style="position:relative; display:grid; grid-tmplate-row:20% 80%; grid-template-columns:65% 15% 20%; padding-bottom:5px; border-bottom:1px solid #444444;">
-                <div class="recentTime">{recentQuake.earthquake.time}</div>
-                <div class="recentLocation">{recentQuake.earthquake.hypocenter.name}</div>
-                <div class="recentMagunitude"><span>M</span><span style="font-size:40px;">{recentQuake.earthquake.hypocenter.magnitude}</span></div>
-                <div class="recentMaxscale" style="color:{convertColor[recentQuake.earthquake.maxScale]};">{quakeScale[recentQuake.earthquake.maxScale]}</div>
-            </div>    
-        {/each}
-    </div>
-    <div class="other">
-        {#if tsunamiJson.length == 0 }
-            <div class="noTsunami">津波予報無し</div>
-        {/if}
-        {#each tsunamiJson as tsunami}
-            {#if tsunami.cancelled == false}
-                <div style="padding:0 0 5px 0; border-bottom:1px solid #444444;">
-                    <p><span style="font-size:20px;">{tsunami.issue.time}</span>発表</p>
-                    <p style="font-size:30px; margin:15px 0;">津波情報発表</p>
-                    <p>以下の津波情報が発表されました</p>
+        </div>
+        <div class="tsunami-right contents-right">
+            {#if tsunamiJson.length == 0 }
+            <div class="tsunami-right-noTsunami">津波情報無し</div>
+            {:else}
+            {#each tsunamiJson as tsunami}
+            <div class="tsunami-right-info" id="tsunami">
+                <div class="tsunami-right-info-time recent-quake-right-info-contents">
+                    <div class="tsunami-right-info-time-title-ja recent-quake-right-info-contents-title-ja">時刻</div>
+                    <div class="tsunami-right-info-time-title-en recent-quake-right-info-contents-title-en">time</div>
+                    <div class="tsunami-right-info-time-time recent-quake-right-info-contents-content">{tsunami.issue.time}</div>
+                </div>
+                <div class="tunami-right-info-detail recent-quake-right-info-contents">
+                    <div class="tunami-right-info-detail-title-ja recent-quake-right-info-contents-title-ja">発令/キャンセル</div>
+                    <div class="tunami-right-info-detail-title-en recent-quake-right-info-contents-title-en">issued or cancelled</div>
+                    {#if tsunami.cancelled == false}
+                    <div class="tunami-right-info-detail-issued recent-quake-right-info-contents-content">発令</div>
                     {#each tsunami.areas as areas}
-                        <div>
-                            <p style="font-size:25px; margin-bottom:5px;">{areas.name}</p>
-                            <p style="display:inline-block; font-size:20px; color:{convertColor[areas.grade]}">{tsunami_type[areas.grade]}</p>
+                    <div class="tunami-right-info-detail-areas">
+                        <div class="tunami-right-info-detail-areas-type">津波警報</div>
+                        <div class="tunami-right-info-detail-areas-detail">
+                            <div class="tunami-right-info-detail-areas-detail-area">宮城県</div>
                             {#if areas.immediate == true}
-                                <p style="display:inline-block;">直ちに来襲</p>
+                            <div class="tunami-right-info-detail-areas-detail-come">直ちに来襲</div>
                             {:else if areas.immediate == false}
-                                <p style="display:inline-block;">直ちに来襲せず</p>
+                            <div class="tunami-right-info-detail-areas-detail-come">直ちに来襲せず</div>
                             {/if}
                         </div>
+                    </div>
                     {/each}
+                    {:else if tsunami.cancelled == true}
+                    <div class="tunami-right-info-detail-issued recent-quake-right-info-contents-content">キャンセル</div>
+                    {/if}
                 </div>
-            {:else if tsunami.cancelled == true}
-                <div style="padding:0 0 5px 0; border-bottom:1px solid #444444;">
-                    <p><span style="font-size:20px;">{tsunami.issue.time}</span>発表</p>
-                    <p style="font-size:30px; margin:15px 0;">キャンセル</p>
-                    <p>先ほどの津波情報はキャンセルされました</p>
-                </div>
+            </div>
+            {/each}
             {/if}
-        {/each}
+        </div>
     </div>
 </div>
 
-
-
 <style>
     .parent{
-        height:100%;
-        margin:20px;
+        width:calc(100vw - 20px);
+        height:calc(100vh - 20px);
+        padding:10px;
         display:grid;
-        grid-template-rows:8% 62% 30%;
-        grid-template-columns:30% 0% 40% 30%;
+        grid-template-rows: 15% 55% 30%;
+        grid-template-columns: 40% 10% 50%;
     }
-    .parent div{
-        margin:10px;
-        position:relative;
-    }
-    .parent div::-webkit-scrollbar{
-        width: 10px;
-        height:7px;
-        background-color: #1e1e1e;
-    }
-    .parent div::-webkit-scrollbar-track{
-        border-radius: 5px;
-        background-color: transparent;
-    }
-    .parent div::-webkit-scrollbar-thumb{
-        border-radius:10px;
-        background-color:#a5a5a5;
-    }
-    .EEWDetection{
-        grid-area:1/1/2/5;
-        border-left:5px solid #03DAC5;
-        box-shadow: rgba(0, 0, 0, 0.4) 0px 7px 29px 0px;
-        display: flex;
-        align-items: center;
-    }
-    .detail{
-        grid-area:2/1/3/2;
-        overflow-y: scroll;
-        border-left:5px solid #03DAC5;
-        box-shadow: rgba(0, 0, 0, 0.4) 0px 7px 29px 0px; 
-    }
-    .detail div p{
-        display:inline-block;
-    } 
-    .detail div{
-        margin:10px 0 10px 10px;
-    }
-    .detail div .small{
-        font-size:20px;
-        text-align: left;
-        margin-right:3px;
-    }
-    .detail div .any{
-        font-size:30px;
-        padding-top:20px;
-    }
-    .detail div .num{
-        font-size:50px
-    }
-    .scales div p{
-        display:block;
-        margin:10px;
-    }
-    .sindo{
-        display:block !important;
-        width:50%;
-        font-size:30px;
-    }
-    .mapParent{
-        grid-area:2/2/3/5;
-        border-left:5px solid #03DAC5;
-        box-shadow: rgba(0, 0, 0, 0.4) 0px 7px 29px 0px; 
-    }
-    .UserQuake{
-        grid-area:3/1/4/3;
-        overflow-y: scroll;
-        border-left:5px solid #03DAC5;
-        box-shadow: rgba(0, 0, 0, 0.4) 0px 7px 29px 0px; 
-    }
-    .UserQuake div div{
-        margin-left:0;
-        margin-right:0;
-    }
-    .UserQuake div div p{
-        display:inline-block;
-    }
-    .RecentQuake{
-        grid-area:3/3/4/4;
-        overflow-y: scroll;
-        border-left:5px solid #03DAC5;
-        box-shadow: rgba(0, 0, 0, 0.4) 0px 7px 29px 0px; 
-    }
-    .RecentQuake div div{
-        margin:0;
-    }
-    .recentTime{
+    .logo{
         grid-area:1/1/2/2;
     }
-    .recentLocation{
-        grid-area:2/1/3/2;
-        font-size:30px;
+    .EEW-detection{
+        grid-area:1/2/2/4;
+        display:grid;
+        grid-template-columns: 160px;
+        position: relative;
     }
-    .recentMagunitude{
-        grid-area:2/2/3/3;
-        align-self:end;
-    }
-    .recentMaxscale{
-        grid-area:1/3/3/4;
-        font-size:50px;
-        justify-self: end;
-    }
-    .other{
-        grid-area:3/4/4/5;
-        overflow-y: scroll;
-        border-left:5px solid #03DAC5;
-        box-shadow: rgba(0, 0, 0, 0.4) 0px 7px 29px 0px; 
-    }
-    .noTsunami{
-        font-size:25px;
-        margin:0 !important;
+    .EEW-detection-right-noninfomation{
+        font-size:24px;
+        margin-left:10px;
+        text-align:left;
         position: absolute;
         top: 50%;
-        left: 50%;
-        -webkit-transform : translate(-50%,-50%);
-        transform : translate(-50%,-50%);
-        text-align: center;
+        -webkit-transform : translateY(-50%);
+        transform : translateY(-50%);
     }
-    .map {
-        margin:0 !important;
-        width: calc(70vw - 70px);
-        height:calc(62vh - 20px);
+    .recent-quake{
+        grid-area:2/1/3/2;
+        display:grid;
+        grid-template-columns: 150px;
+    }
+    .recent-quake-right-color-bar{
+        text-align:right;
+        color:#FFFFFF;
+        font-size:36px;
+    }
+    .recent-quake-right-info-area-area-intencity{
+        margin:15px 0 10px 0;
+    }
+    .recent-quake-right-info-area-area-name{
+        margin-left:20px;
+        font-size:20px;
+    }
+    .recent-quake-right{
+        overflow-y: scroll;
+    }
+    .recent-quake-right::-webkit-scrollbar{
+        background-color:#ffffff;
+        width:5px;
+    }
+    .recent-quake-right::-webkit-scrollbar-corner{
+        background-color:transparent;
+    }
+    .recent-quake-right::-webkit-scrollbar-thumb{
+        background-color:#c1c1c1;
+    }
+    .recent-quake-right::-webkit-scrollbar-button{
+        background-color:#c1c1c1;
+        height:5px;
+    }
+    .distribution{
+        grid-area:2/2/3/4;
+        display:grid;
+        grid-template-columns: 150px;
+    }
+    .distribution-right-map{
+        width:calc(55vw - 200px);
+        height:calc(55vh - 30px);
+    }
+    .past-quake{
+        grid-area:3/1/4/3;
+        display:grid;
+        grid-template-columns: 150px;
+    }
+    .past-quake-right{
+        overflow-y:scroll;
+        margin-left:10px;
+    }
+    .past-quake-right::-webkit-scrollbar{
+        background-color:#ffffff;
+        width:5px;
+    }
+    .past-quake-right::-webkit-scrollbar-corner{
+        background-color:transparent;
+    }
+    .past-quake-right::-webkit-scrollbar-thumb{
+        background-color:#c1c1c1;
+    }
+    .past-quake-right::-webkit-scrollbar-button{
+        background-color:#c1c1c1;
+        height:5px;
+    }
+    .past-quake-right-each-info{
+        display:grid;
+        grid-template-columns:60% 20% 20%;
+        justify-content: space-between;
+        place-content: end center;
+    }
+    .past-quake-right-each-info1{
+        grid-area:1/1/2/2;
+        margin-bottom:10px;
+    }
+    .past-quake-right-each-info1-time{
+        font-size:18px;
+    }
+    .past-quake-right-each-info2{
+        grid-area:1/2/2/3;
+    }
+    .past-quake-right-each-info1-hypocenter{
+        font-size:26px;
+    }
+    .past-quake-right-each-info2-magunitude{
+        font-size:42px;
+    }
+    .past-quake-right-each-info3{
+        grid-area:1/3/3/4;
+        text-align:right;
+    }
+    .past-quake-right-each-info3-inner{
+        font-size:42px;
+        text-align:left;
+        display: inline-block;
+        height: calc(100% - 15px);
+        padding:5px 10px 0 5px;
+    }
+    .tsunami{
+        grid-area:3/3/4/4;
+        display:grid;
+        grid-template-columns: 150px;
+    }
+    .tsunami-right{
+        overflow-y:scroll;
+        position: relative;
+    }
+    .tsunami-right::-webkit-scrollbar{
+        background-color:#ffffff;
+        width:5px;
+    }
+    .tsunami-right::-webkit-scrollbar-corner{
+        background-color:transparent;
+    }
+    .tsunami-right::-webkit-scrollbar-thumb{
+        background-color:#c1c1c1;
+    }
+    .tsunami-right::-webkit-scrollbar-button{
+        background-color:#c1c1c1;
+        height:5px;
+    }
+    .tsunami-right-noTsunami{
+        font-size:24px;
+        margin-left:10px;
+        text-align:left;
+        position: absolute;
+        top: 50%;
+        -webkit-transform : translateY(-50%);
+        transform : translateY(-50%);
+    }
+    .tsunami-right-info{
+        margin-left:10px;
+        margin-bottom:15px;
+    }
+    .tunami-right-info-detail-areas{
+        margin-left:50px;
+    }
+    .tunami-right-info-detail-areas-detail-area{
+        font-size:18px;
+    }
+    .tunami-right-info-detail-areas-detail{
+        display:inline-block;
+    }
+    .tunami-right-info-detail-areas-type{
+        display:inline-block;
+        font-size:36px;
+        margin-right:20px;
+    }
+    .tunami-right-info-detail-areas-detail-come{
+        font-size:18px;
+    }
+    .contents{
+        padding:10px;
+    }
+    .contents-left{
+        grid-area:1/1/2/2;
+        border-right:2px solid #000000;
+    }
+    .contents-left-explanation{
+        margin-top:40px;
+        margin-right:10px;
+        text-align:right;
+    }
+    .contents-left-explanation-ja{
+        font-size:24px;
+    }
+    .contents-left-explanation-en{
+
+    }
+    .contents-right{
+        grid-area:1/2/2/3;
+    }
+    .recent-quake-right-contents{
+        margin-left:10px;
+        margin-bottom:10px;
+    }
+    .recent-quake-right-info-contents{
+        margin-bottom:10px;
+    }
+    .recent-quake-right-info-contents-title-ja{
+        font-size:18px;
+        display:inline-block;
+    }
+    .recent-quake-right-info-contents-title-en{
+        display:inline-block;
+    }
+    .recent-quake-right-info-contents-content{
+        margin-left:30px;
+        font-size:24px;
     }
 </style>
