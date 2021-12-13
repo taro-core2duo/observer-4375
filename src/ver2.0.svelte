@@ -11,6 +11,7 @@
     import { confidence} from "./confidence"
     import { sample1 } from "./sample1"
     import { sample2 } from "./sample2"
+    import { sample3 } from "./sample3"
     import { scales_for_map } from "./scales-for-map"
     import {LeafletMap, Icon, Marker, TileLayer} from 'svelte-leafletjs';
     import moment from 'moment';
@@ -734,8 +735,7 @@
         setTimeout(window.location.reload(), 3000)
     };
 
-    Rjson[0] = sample1
-    userQuakeJson[0] = sample2
+    tsunamiJson[0] = sample3[0]
     getFirst();
     setInterval(function(){
         try{
@@ -759,9 +759,9 @@
         }catch(e){
             console.log(e)
         };
-        Rjson[0] = sample1
+        tsunamiJson[0] = sample3[0]
         get()
-    },200000);
+    },20000);
 
     setInterval(function(){
         try{
@@ -773,9 +773,8 @@
         }catch(e){
             console.log(e)
         };
-        userQuakeJson[0] = sample2
         get()
-    },200000);
+    },20000);
 
     let date;
     let nowDate;
@@ -795,21 +794,23 @@
 
     drawmap()
     const data_for_map = quake[0]
+    const data_for_map2 = quake[1]
 
     const mapOptions = {
         center: [data_for_map.lat, data_for_map.lon],
         zoom: 9,
     };
-    const tileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+    const tileUrl = "https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png";
     const tileLayerOptions = {
         minZoom: 0,
         maxZoom: 20,
         maxNativeZoom: 19,
-        attribution: "© OpenStreetMap contributors",
+        attribution: `Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`,
     };
     const iconOptions = {
         iconUrl: '/scale/center.png',
         iconSize: [30, 30],
+        iconAnchor:[15,15]
     };
 
     let sumlat = 0;
@@ -841,8 +842,7 @@
             </div>
         </div>
         <div class="EEW-detection-right contents-right">
-            {#if userQuakeJson[0].confidence !== 0}
-            {#if (moment(nowDate, "YYYYMMDDHHSS.SSS").diff(moment(userQuakeJson[0].updated_at.replace(/\/|:|\s/g,""), "YYYYMMDDHHSS.SSS"), "minutes") <= 5 )}
+            {#if userQuakeJson[0].confidence != 0 && (moment(nowDate, "YYYYMMDDHHSS.SSS").diff(moment(userQuakeJson[0].updated_at.replace(/\/|:|\s/g,""), "YYYYMMDDHHSS.SSS"), "minutes") <= 5 )}
                 <div class="EEW-detection-right-time">{userQuakeJson[0].updated_at}</div>
                 <div class="EEW-detection-right-happen">地震発生の可能性</div>
                 <div class="EEW-detection-right-area">
@@ -859,7 +859,6 @@
                 </div>
             {:else}
             <div class="EEW-detection-right-noninfomation">情報なし</div>
-            {/if}
             {/if}
         </div>
     </div>
@@ -1015,20 +1014,26 @@
                     {#each data_for_map.points as point}
                         {#each scales_for_map as scales}
                             {#if point.scale == scales[0]}
+                            {#if point.lat != null || point.lon != null}
                                 <Marker latLng={[point.lat, point.lon]} zIndexOffset={scales[2]}>
                                     <Icon options={scales[1]}/>
                                 </Marker>
                             {/if}
+                            {/if}
                         {/each}
                     {/each}
                     {#if (data_for_map.type == "DetailScale")}
-                    <Marker latLng={[data_for_map.lat, data_for_map.lon]} zIndexOffset={5000}>
-                        <Icon options={iconOptions}/>
-                    </Marker>
+                        {#if data_for_map.lat !== null || data_for_map.lon !== null}
+                        <Marker latLng={[data_for_map.lat, data_for_map.lon]} zIndexOffset={5000}>
+                            <Icon options={iconOptions}/>
+                        </Marker>
+                        {/if}
                     {:else if (data_for_map.type == "ScalePrompt")}
-                    <Marker latLng={[data_for_map.lat, data_for_map.lon]} zIndexOffset={5000}>
-                        <Icon options={iconOptions}/>
-                    </Marker>
+                        {#if data_for_map2.lat !== null || data_for_map2.lon !== null}
+                        <Marker latLng={[data_for_map2.lat, data_for_map2.lon]} zIndexOffset={5000}>
+                            <Icon options={iconOptions}/>
+                        </Marker>
+                        {/if}
                     {/if}
                 </LeafletMap>
                 {:else if data_for_map.type == "Destination"}
@@ -1037,9 +1042,11 @@
                     {#each data_for_map.points as point}
                         {#each scales_for_map as scales}
                             {#if point.scale == scales[0]}
+                                {#if point.lat !== null || point.lon !== null}
                                 <Marker latLng={[point.lat, point.lon]} zIndexOffset={scales[2]}>
                                     <Icon options={scales[1]}/>
                                 </Marker>
+                                {/if}
                             {/if}
                         {/each}
                     {/each}
@@ -1097,9 +1104,9 @@
                     <div class="tunami-right-info-detail-issued recent-quake-right-info-contents-content">発令</div>
                     {#each tsunami.areas as areas}
                     <div class="tunami-right-info-detail-areas">
-                        <div class="tunami-right-info-detail-areas-type">津波警報</div>
+                        <div class="tunami-right-info-detail-areas-type" style="border-left:10px solid {tsunami_type[areas.grade][1]}">{tsunami_type[areas.grade][0]}</div>
                         <div class="tunami-right-info-detail-areas-detail">
-                            <div class="tunami-right-info-detail-areas-detail-area">宮城県</div>
+                            <div class="tunami-right-info-detail-areas-detail-area">{areas.name}</div>
                             {#if areas.immediate == true}
                             <div class="tunami-right-info-detail-areas-detail-come">直ちに来襲</div>
                             {:else if areas.immediate == false}
@@ -1323,7 +1330,7 @@
         margin-bottom:15px;
     }
     .tunami-right-info-detail-areas{
-        margin-left:50px;
+        margin-left:30px;
     }
     .tunami-right-info-detail-areas-detail-area{
         font-size:18px;
