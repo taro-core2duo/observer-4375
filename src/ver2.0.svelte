@@ -12,6 +12,7 @@
     import { sample1 } from "./sample1"
     import { sample2 } from "./sample2"
     import { sample3 } from "./sample3"
+    import { sample4 } from "./sample4"
     import { scales_for_map } from "./scales-for-map"
     import {LeafletMap, Icon, Marker, TileLayer} from 'svelte-leafletjs';
     import moment from 'moment';
@@ -24,7 +25,6 @@
 
     let areaNameLength = areaName.length
     
-    import Map from '@anoram/leaflet-svelte'
     import { onMount } from "svelte";
 
 
@@ -498,174 +498,7 @@
         console.log(judgeZero)
     };
 
-    const drawmap = () => {
-        let r = 0
-        //if( lastJson !== apiHttps.responseText ){
-            Rjson[r].points.sort(function(first,second){
-                return first.scale - second.scale
-            })
-            console.log(Rjson[r])
-            if(Rjson[r].code == 551 && quake[r].type == "DetailScale"){
-                options.center = [quake[r].lat, quake[r].lon]
-                options.zoom = 9
-                for(let q = 0; q < quake[r].points.length; q++){
-                    options.markers[q] = {}
-                    options.markers[q].lat = quake[r].points[q].lat
-                    options.markers[q].lng = quake[r].points[q].lon
-                    options.markers[q].iconSize = [20,20]
-                    options.markers[q].iconAnchor = [-10,1-0]
-                    if(quake[r].points[q].changedScale == "1"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/1.png"
-                        options.markers[q].setZIndexOffset = 1000
-                    }else if(quake[r].points[q].changedScale == "2"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/2.png"
-                    }else if(quake[r].points[q].changedScale == "3"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/3.png"
-                    }else if(quake[r].points[q].changedScale == "4"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/4.png"
-                    }else if(quake[r].points[q].changedScale == "5弱"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/5-.png"
-                    }else if(quake[r].points[q].changedScale == "5強"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/5+.png"
-                    }else if(quake[r].points[q].changedScale == "6弱"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/6-.png"
-                    }else if(quake[r].points[q].changedScale == "6強"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/6+.png"
-                    }else if(quake[r].points[q].changedScale == "7"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/7.png"
-                    }
-                    if( options.markers[q].lat == undefined || options.markers[q].lng == undefined ){
-                        options.markers[q].lat = 0
-                        options.markers[q].lng = 0
-                        options.markers[q].icon = {}
-                        options.markers[q].iconSize = [0,0]
-                        options.markers[q].icon.iconUrl = "/scale/undefined.png"
-                    }
-                }
-                let last = options.markers.length
-                options.markers[last+1] = {}
-                options.markers[last+1].lat = quake[r].lat
-                options.markers[last+1].lng = quake[r].lon
-                options.markers[last+1].iconSize = [30,30]
-                options.markers[last+1].iconAnchor = [-15,-15]
-                options.markers[last+1].icon = {}
-                options.markers[last+1].icon.iconUrl = "/scale/center.png"
-            }
 
-            if(Rjson[r].code == 551 && quake[r].type == "ScalePrompt"){
-                let sumlat = 0;
-                let sumlon = 0;
-                for(let i = 0; i < quake[r].points.length; i++){
-                    let replacedLat = quake[r].points[i].lat/quake[r].points.length
-                    let replacedLon = quake[r].points[i].lon/quake[r].points.length
-                    sumlat += replacedLat
-                    sumlon += replacedLon
-                }
-                options.center = [Math.floor(sumlat * Math.pow(10,3))/Math.pow(10,3),Math.floor(sumlon * Math.pow(10,3))/Math.pow(10,3)]
-                options.zoom = 7
-                for(let q = 0; q < quake[r].points.length; q++){
-                    options.markers[q] = {}
-                    options.markers[q].lat = quake[r].points[q].lat
-                    options.markers[q].lng = quake[r].points[q].lon
-                    options.markers[q].iconSize = [20,20]
-                    options.markers[q].iconAnchor = [-10,-10]
-                    if(quake[r].points[q].changedScale == "1"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/1.png"
-                    }else if(quake[r].points[q].changedScale == "2"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/2.png"
-                    }else if(quake[r].points[q].changedScale == "3"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/3.png"
-                    }else if(quake[r].points[q].changedScale == "4"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/4.png"
-                    }else if(quake[r].points[q].changedScale == "5弱"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/5-.png"
-                    }else if(quake[r].points[q].changedScale == "5強"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/5+.png"
-                    }else if(quake[r].points[q].changedScale == "6弱"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/6-.png"
-                    }else if(quake[r].points[q].changedScale == "6強"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/6+.png"
-                    }else if(quake[r].points[q].changedScale == "7"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/7.png"
-                    }
-                }
-                console.log(options)
-            }
-
-            if(Rjson[r].code == 551 && quake[r].type == "Destination"){
-                let same;
-                for(let i = r+1; i < Rjson.length; i++){
-                    if(quake[r].time == quake[i].time){
-                        same = i
-                        console.log(same)
-                    }
-                }
-                options.center = [quake[r].lat, quake[r].lon]
-                options.zoom = 7
-                for(let q = 0; q < quake[same].points.length; q++){
-                    options.markers[q] = {}
-                    options.markers[q].lat = quake[same].points[q].lat
-                    options.markers[q].lng = quake[same].points[q].lon
-                    options.markers[q].iconSize = [20,20]
-                    options.markers[q].iconAnchor = [-10,-10]
-                    if(quake[same].points[q].changedScale == "1"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/1.png"
-                    }else if(quake[same].points[q].changedScale == "2"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/2.png"
-                    }else if(quake[same].points[q].changedScale == "3"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/3.png"
-                    }else if(quake[same].points[q].changedScale == "4"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/4.png"
-                    }else if(quake[same].points[q].changedScale == "5弱"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/5-.png"
-                    }else if(quake[same].points[q].changedScale == "5強"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/5+.png"
-                    }else if(quake[same].points[q].changedScale == "6弱"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/6-.png"
-                    }else if(quake[same].points[q].changedScale == "6強"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/6+.png"
-                    }else if(quake[same].points[q].changedScale == "7"){
-                        options.markers[q].icon = {}
-                        options.markers[q].icon.iconUrl = "/scale/7.png"
-                    }
-                }
-                let last = options.markers.length
-                options.markers[last+1] = {}
-                options.markers[last+1].lat = quake[r].lat
-                options.markers[last+1].lng = quake[r].lon
-                options.markers[last+1].iconSize = [30,30]
-                options.markers[last+1].iconAnchor = [-15,-15]
-                options.markers[last+1].icon = {}
-                options.markers[last+1].icon.iconUrl = "/scale/center.png"
-            }
-        //}
-    }
     
     let judgeZero
     let Rjson;
@@ -676,7 +509,7 @@
     let tsunamiJson;
     try{
         apiHttps = new XMLHttpRequest();
-        apiHttps.open("GET", "https://api.p2pquake.net/v2/history?codes=551", false);
+        apiHttps.open("GET", "https://api.p2pquake.net/v2/history?codes=551&limit=2", false);
         apiHttps.onreadystatechange = function(){
             if(this.readyState === 4 && this.status === 200){
                 console.log("success")
@@ -705,7 +538,7 @@
         lastQuakeJson = JSON.parse(lastQuakeLog);
 
         const userQuake = new XMLHttpRequest();
-        userQuake.open("GET", "https://api.p2pquake.net/v2/history?codes=9611&limit=20", false);
+        userQuake.open("GET", "https://api.p2pquake.net/v2/history?codes=9611&limit=1", false);
         userQuake.onreadystatechange = function(){
             if(this.readyState === 4 && this.status === 200){
                 console.log("success")
@@ -719,7 +552,7 @@
         userQuakeJson = JSON.parse(userQuakeLog);
 
         const tsunami = new XMLHttpRequest();
-        tsunami.open("GET", "https://api.p2pquake.net/v2/history?codes=522", false);
+        tsunami.open("GET", "https://api.p2pquake.net/v2/history?codes=522&limit=4", false);
         tsunami.onreadystatechange = function(){
             if(this.readyState === 4 && this.status === 200){
                 console.log("success")
@@ -736,11 +569,13 @@
     };
 
     tsunamiJson[0] = sample3[0]
+    Rjson[0] = sample4[2]
     getFirst();
+
     setInterval(function(){
         try{
             apiHttps = new XMLHttpRequest();
-            apiHttps.open("GET", "https://api.p2pquake.net/v2/history?codes=551", false);
+            apiHttps.open("GET", "https://api.p2pquake.net/v2/history?codes=551&limit=2", false);
             apiHttps.send();
             const log = apiHttps.responseText;
             Rjson = JSON.parse(log);
@@ -752,7 +587,7 @@
             lastQuakeJson = JSON.parse(logQuakes);
             
             const tsunami = new XMLHttpRequest();
-            tsunami.open("GET", "https://api.p2pquake.net/v2/jma/tsunami?limit=5", false);
+            tsunami.open("GET", "https://api.p2pquake.net/v2/history?codes=522&limit=4", false);
             tsunami.send();
             const tsunamiLog = tsunami.responseText;
             tsunamiJson = JSON.parse(tsunamiLog);
@@ -760,13 +595,14 @@
             console.log(e)
         };
         tsunamiJson[0] = sample3[0]
+        Rjson[0] = sample4[2]
         get()
     },20000);
 
     setInterval(function(){
         try{
             const userQuake = new XMLHttpRequest();
-            userQuake.open("GET", "https://api.p2pquake.net/v2/history?codes=9611&limit=20", false);
+            userQuake.open("GET", "https://api.p2pquake.net/v2/history?codes=9611&limit=1", false);
             userQuake.send();
             const userQuakeLog = userQuake.responseText;
             userQuakeJson = JSON.parse(userQuakeLog);
@@ -774,7 +610,7 @@
             console.log(e)
         };
         get()
-    },20000);
+    },10000);
 
     let date;
     let nowDate;
@@ -792,7 +628,6 @@
         firstChild.remove()
     })
 
-    drawmap()
     const data_for_map = quake[0]
     const data_for_map2 = quake[1]
 
