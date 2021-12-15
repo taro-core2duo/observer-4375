@@ -28,21 +28,6 @@
     import { onMount } from "svelte";
 
 
-    let options={
-        center: [],
-        zoom: [],
-        markers: [],
-        mapID: "map",
-        tilelayers: [
-            {
-                url: "https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png",
-                attribution: `Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`,
-            }
-        ],
-    }
-
-
-
     let quake = []
 
     const getFirst = () => {
@@ -66,8 +51,10 @@
                 quake[e].detailLength = info.points.length
                 quake[e].points = info.points
                 quake[e].arrayScale = {}
+                quake[e].arrayScale2 = {}
                 for(let f = 0; f < 9; f++){
                     quake[e].arrayScale[f] = []
+                    quake[e].arrayScale2[f] = []
                 }
                 let scale1 = 0;
                 let scale2 = 0;
@@ -82,40 +69,48 @@
                     let pointsScale = info.points[i].scale
                     let changed = quakeScale[pointsScale]
                     quake[e].points[i].changedScale = changed
-                    if(info.points[i].changedScale == "1"){
-                        quake[e].arrayScale[0][scale1] = info.points[i].addr
-                        scale1++
-                    }else if(info.points[i].changedScale == "2"){
-                        quake[e].arrayScale[1][scale2] = info.points[i].addr
-                        scale2++
-                    }else if(info.points[i].changedScale == "3"){
-                        quake[e].arrayScale[2][scale3] = info.points[i].addr
-                        scale3++
-                    }else if(info.points[i].changedScale == "4"){
-                        quake[e].arrayScale[3][scale4] = info.points[i].addr
-                        scale4++
-                    }else if(info.points[i].changedScale == "5弱"){
-                        quake[e].arrayScale[4][scale45] = info.points[i].addr
-                        scale45++
-                    }else if(info.points[i].changedScale == "5強"){
-                        quake[e].arrayScale[5][scale5] = info.points[i].addr
-                        scale5++
-                    }else if(info.points[i].changedScale == "6弱"){
-                        quake[e].arrayScale[6][scale55] = info.points[i].addr
-                        scale55++
-                    }else if(info.points[i].changedScale == "6強"){
-                        quake[e].arrayScale[7][scale6] = info.points[i].addr
-                        scale6++
-                    }else if(info.points[i].changedScale == "7"){
-                        quake[e].arrayScale[8][scale7] = info.points[i].addr
-                        scale7++
-                    }
                     for(let o = 0; o < pointLength; o++){
                         if(pointData[o].name == info.points[i].addr){
                             quake[e].points[i].lat = pointData[o].lat
                             quake[e].points[i].lon = pointData[o].lon
+                            quake[e].points[i].city = pointData[o].city.name
+                            quake[e].points[i].pref = pointData[o].pref.name
                             break;
                         }else{}
+                        if(quake[e].points[i].city == undefined){
+                            quake[e].points[i].city = "データなし"
+                        }
+                    }
+                    if(info.points[i].changedScale == "1"){
+                        quake[e].arrayScale[0][scale1] = info.points[i].pref + " " + info.points[i].city
+                        scale1++
+                    }else if(info.points[i].changedScale == "2"){
+                        quake[e].arrayScale[1][scale2] = info.points[i].pref + " " + info.points[i].city
+                        scale2++
+                    }else if(info.points[i].changedScale == "3"){
+                        quake[e].arrayScale[2][scale3] = info.points[i].pref + " " + info.points[i].city
+                        scale3++
+                    }else if(info.points[i].changedScale == "4"){
+                        quake[e].arrayScale[3][scale4] = info.points[i].pref + " " + info.points[i].city
+                        scale4++
+                    }else if(info.points[i].changedScale == "5弱"){
+                        quake[e].arrayScale[4][scale45] = info.points[i].pref + " " + info.points[i].city
+                        scale45++
+                    }else if(info.points[i].changedScale == "5強"){
+                        quake[e].arrayScale[5][scale5] = info.points[i].pref + " " + info.points[i].city
+                        scale5++
+                    }else if(info.points[i].changedScale == "6弱"){
+                        quake[e].arrayScale[6][scale55] = info.points[i].pref + " " + info.points[i].city
+                        scale55++
+                    }else if(info.points[i].changedScale == "6強"){
+                        quake[e].arrayScale[7][scale6] = info.points[i].pref + " " + info.points[i].city
+                        scale6++
+                    }else if(info.points[i].changedScale == "7"){
+                        quake[e].arrayScale[8][scale7] = info.points[i].pref + " " + info.points[i].city
+                        scale7++
+                    }
+                    for(let i = 0; i < 8; i++){
+                        quake[e].arrayScale2[i] = Array.from(new Set(quake[e].arrayScale[i]))
                     }
                 }
             }else if(info.code == 551 && info.issue.type == "ScalePrompt"){
@@ -212,8 +207,10 @@
                 quake[e].detailLength = info.points.length
                 quake[e].points = info.points
                 quake[e].arrayScale = {}
+                quake[e].arrayScale2 = {}
                 for(let f = 0; f < 9; f++){
                     quake[e].arrayScale[f] = []
+                    quake[e].arrayScale2[f] = []
                 }
                 let scale1 = 0;
                 let scale2 = 0;
@@ -228,40 +225,48 @@
                     let pointsScale = info.points[i].scale
                     let changed = quakeScale[pointsScale]
                     quake[e].points[i].changedScale = changed
-                    if(info.points[i].changedScale == "1"){
-                        quake[e].arrayScale[0][scale1] = info.points[i].addr
-                        scale1++
-                    }else if(info.points[i].changedScale == "2"){
-                        quake[e].arrayScale[1][scale2] = info.points[i].addr
-                        scale2++
-                    }else if(info.points[i].changedScale == "3"){
-                        quake[e].arrayScale[2][scale3] = info.points[i].addr
-                        scale3++
-                    }else if(info.points[i].changedScale == "4"){
-                        quake[e].arrayScale[3][scale4] = info.points[i].addr
-                        scale4++
-                    }else if(info.points[i].changedScale == "5弱"){
-                        quake[e].arrayScale[4][scale45] = info.points[i].addr
-                        scale45++
-                    }else if(info.points[i].changedScale == "5強"){
-                        quake[e].arrayScale[5][scale5] = info.points[i].addr
-                        scale5++
-                    }else if(info.points[i].changedScale == "6弱"){
-                        quake[e].arrayScale[6][scale55] = info.points[i].addr
-                        scale55++
-                    }else if(info.points[i].changedScale == "6強"){
-                        quake[e].arrayScale[7][scale6] = info.points[i].addr
-                        scale6++
-                    }else if(info.points[i].changedScale == "7"){
-                        quake[e].arrayScale[8][scale7] = info.points[i].addr
-                        scale7++
-                    }
                     for(let o = 0; o < pointLength; o++){
                         if(pointData[o].name == info.points[i].addr){
                             quake[e].points[i].lat = pointData[o].lat
                             quake[e].points[i].lon = pointData[o].lon
+                            quake[e].points[i].city = pointData[o].city.name
+                            quake[e].points[i].pref = pointData[o].pref.name
                             break;
                         }else{}
+                        if(quake[e].points[i].city == undefined){
+                            quake[e].points[i].city = "データなし"
+                        }
+                    }
+                    if(info.points[i].changedScale == "1"){
+                        quake[e].arrayScale[0][scale1] = info.points[i].pref + " " + info.points[i].city
+                        scale1++
+                    }else if(info.points[i].changedScale == "2"){
+                        quake[e].arrayScale[1][scale2] = info.points[i].pref + " " + info.points[i].city
+                        scale2++
+                    }else if(info.points[i].changedScale == "3"){
+                        quake[e].arrayScale[2][scale3] = info.points[i].pref + " " + info.points[i].city
+                        scale3++
+                    }else if(info.points[i].changedScale == "4"){
+                        quake[e].arrayScale[3][scale4] = info.points[i].pref + " " + info.points[i].city
+                        scale4++
+                    }else if(info.points[i].changedScale == "5弱"){
+                        quake[e].arrayScale[4][scale45] = info.points[i].pref + " " + info.points[i].city
+                        scale45++
+                    }else if(info.points[i].changedScale == "5強"){
+                        quake[e].arrayScale[5][scale5] = info.points[i].pref + " " + info.points[i].city
+                        scale5++
+                    }else if(info.points[i].changedScale == "6弱"){
+                        quake[e].arrayScale[6][scale55] = info.points[i].pref + " " + info.points[i].city
+                        scale55++
+                    }else if(info.points[i].changedScale == "6強"){
+                        quake[e].arrayScale[7][scale6] = info.points[i].pref + " " + info.points[i].city
+                        scale6++
+                    }else if(info.points[i].changedScale == "7"){
+                        quake[e].arrayScale[8][scale7] = info.points[i].pref + " " + info.points[i].city
+                        scale7++
+                    }
+                    for(let i = 0; i < 8; i++){
+                        quake[e].arrayScale2[i] = Array.from(new Set(quake[e].arrayScale[i]))
                     }
                 }
             }else if(info.code == 551 && info.issue.type == "ScalePrompt"){
@@ -569,7 +574,7 @@
     };
 
     tsunamiJson[0] = sample3[0]
-    Rjson[0] = sample4[2]
+    Rjson[0] = sample4[3]
     getFirst();
 
     setInterval(function(){
@@ -595,7 +600,7 @@
             console.log(e)
         };
         tsunamiJson[0] = sample3[0]
-        Rjson[0] = sample4[2]
+        Rjson[0] = sample4[3]
         get()
     },20000);
 
@@ -743,9 +748,9 @@
                     <div class="recent-quake-right-info-area-title-en recent-quake-right-info-contents-title-en">intensity in each area</div>
                     <div class="recent-quake-right-info-area-area recent-quake-right-info-contents-content">
                         {#each changeArray as change}
-                        {#if quake[0].arrayScale[change].length > 0}
-                        <div class="recent-quake-right-info-area-area-intencity">{convertScales[change]}</div>
-                        {#each quake[0].arrayScale[change] as location}
+                        {#if quake[0].arrayScale2[change].length > 0}
+                        <div class="recent-quake-right-info-area-area-intencity" style="border-bottom:2px solid {convertColor[change][0]};">{convertScales[change]}</div>
+                        {#each quake[0].arrayScale2[change] as location}
                         <div class="recent-quake-right-info-area-area-name">{location}</div>
                         {/each}
                         {/if}
@@ -1040,7 +1045,7 @@
         font-size:36px;
     }
     .recent-quake-right-info-area-area-intencity{
-        margin:15px 0 10px 0;
+        margin:15px 30px 10px 0;
     }
     .recent-quake-right-info-area-area-name{
         margin-left:20px;

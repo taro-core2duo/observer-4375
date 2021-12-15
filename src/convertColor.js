@@ -1,5 +1,5 @@
 export const convertColor = {
-    "-1": ["#ffffff",""],
+    "-1": ["#ffffff","#000000"],
     "10": ["#9DDFD3","#000000"],
     "20": ["#396EB0","#ffffff"],
     "30": ["#259F6C","#ffffff"],
@@ -24,5 +24,14 @@ export const convertColor = {
     "MajorWarning": "#C800FF",
     "Warning": "#FF2800",
     "Watch": "#FAF500",
-    "Unknown": "#ffffff"
+    "Unknown": "#ffffff",
+    "0": ["#9DDFD3","#000000"],
+    "1": ["#396EB0","#ffffff"],
+    "2": ["#259F6C","#ffffff"],
+    "3": ["#FFE143","#000000"],
+    "4": ["#FFB800","#000000"],
+    "5": ["#FF7800","#000000"],
+    "6": ["#FF5656","#ffffff"],
+    "7": ["#FF3434","#ffffff"],
+    "8": ["#52006A","#ffffff"],
 }
