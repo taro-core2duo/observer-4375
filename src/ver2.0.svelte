@@ -673,7 +673,9 @@
 </script>
 
 <div class="parent">
-    <div class="logo contents"></div>
+    <div class="logo contents">
+        <div class="logo-inner">observer<br>4375</div>
+    </div>
     <div class="EEW-detection contents">
         <div class="EEW-detection-left contents-left">
             <div class="EEW-detection-left-explanation contents-left-explanation">
@@ -977,14 +979,54 @@
         grid-template-rows: 15% 55% 30%;
         grid-template-columns: 40% 10% 50%;
     }
+    @media (max-width: 768px){
+        .parent{
+            height:calc(200vh - 20px);
+            width:calc(100vw - 32px);
+            grid-template-rows: 7.5% 7.5% 30% 25% 15% 15%;
+            grid-template-columns: 90%;
+        }   
+    }
     .logo{
         grid-area:1/1/2/2;
+    }
+    @media (max-width: 768px){
+        .logo{
+            grid-area:1/1/2/2;
+        } 
+    }
+    .logo-inner{
+        font-size:40px;
+        text-align:left;
+        margin-left:20px;
     }
     .EEW-detection{
         grid-area:1/2/2/4;
         display:grid;
         grid-template-columns: 160px;
         position: relative;
+    }@media (max-width: 768px){
+        .EEW-detection{
+            grid-area:2/1/3/2;
+        } 
+    }
+    @media (max-width: 768px){
+        .EEW-detection{
+            grid-area:2/1/3/2;
+        } 
+    }
+    @media (max-width: 1024px){
+        .EEW-detection{
+            grid-template-columns: 140px;
+        }
+    }
+    .EEW-detection-left-explanation{
+        margin-top:20px !important;
+    }
+    @media (max-width: 768px){
+        .EEW-detection-left-explanation{
+            margin-top:40px !important;
+        }
     }
     .EEW-detection-right-noninfomation{
         font-size:24px;
@@ -1039,10 +1081,29 @@
         display:grid;
         grid-template-columns: 150px;
     }
+    @media (max-width: 768px){
+        .recent-quake{
+            grid-area:3/1/4/2;
+        } 
+    }
+    @media (max-width: 1024px){
+        .recent-quake{
+            grid-template-columns: 130px;
+        }
+    }
+    @media (max-width: 768px){
+        .recent-quake{
+            grid-template-columns: 140px;
+        }
+    }
     .recent-quake-right-color-bar{
         text-align:right;
-        color:#FFFFFF;
         font-size:36px;
+    }
+    @media (max-width: 1024px){
+        .recent-quake-right-color-bar{
+            font-size:30px;
+        }
     }
     .recent-quake-right-info-area-area-intencity{
         margin:15px 30px 10px 0;
@@ -1073,14 +1134,50 @@
         display:grid;
         grid-template-columns: 150px;
     }
+    @media (max-width: 768px){
+        .distribution{
+            grid-area:4/1/5/2;
+        } 
+    }
+    @media (max-width: 1024px){
+        .distribution{
+            grid-template-columns: 130px;
+        }
+    }
+    @media (max-width: 768px){
+        .distribution{
+            grid-template-columns: 140px;
+        }
+    }
     .distribution-right-map{
         width:calc(55vw - 140px);
         height:calc(55vh - 30px);
+    }
+    @media (max-width: 768px){
+        .distribution-right-map{
+            width:calc(90vw - 190px);
+            height:calc(50vh - 25px);
+        }
     }
     .past-quake{
         grid-area:3/1/4/3;
         display:grid;
         grid-template-columns: 150px;
+    }
+    @media (max-width: 768px){
+        .past-quake{
+            grid-area:5/1/6/2;
+        } 
+    }
+    @media (max-width: 1024px){
+        .past-quake{
+            grid-template-columns: 130px;
+        }
+    }
+    @media (max-width: 768px){
+        .past-quake{
+            grid-template-columns: 140px;
+        }
     }
     .past-quake-right{
         overflow-y:scroll;
@@ -1113,14 +1210,30 @@
     .past-quake-right-each-info1-time{
         font-size:18px;
     }
+    @media (max-width: 1024px){
+        .past-quake-right-each-info1-time{
+            font-size:16px;
+        }
+    }
     .past-quake-right-each-info2{
         grid-area:1/2/2/3;
     }
     .past-quake-right-each-info1-hypocenter{
         font-size:26px;
     }
+    @media (max-width: 1024px){
+        .past-quake-right-each-info1-hypocenter{
+            font-size:22px;
+        }
+    }
     .past-quake-right-each-info2-magunitude{
         font-size:42px;
+    }
+    @media (max-width: 1024px){
+        .past-quake-right-each-info2-magunitude{
+            font-size:34px;
+            margin-top:10px;
+        }
     }
     .past-quake-right-each-info3{
         grid-area:1/3/3/4;
@@ -1133,10 +1246,30 @@
         height: calc(100% - 15px);
         padding:5px 10px 0 5px;
     }
+    @media (max-width: 1024px){
+        .past-quake-right-each-info3-inner{
+            font-size:38px;
+        }
+    }
     .tsunami{
         grid-area:3/3/4/4;
         display:grid;
         grid-template-columns: 150px;
+    }
+    @media (max-width: 768px){
+        .tsunami{
+            grid-area:6/1/7/2;
+        } 
+    }
+    @media (max-width: 1024px){
+        .tsunami{
+            grid-template-columns: 130px;
+        }
+    }
+    @media (max-width: 768px){
+        .tsunami{
+            grid-template-columns: 140px;
+        }
     }
     .tsunami-right{
         overflow-y:scroll;
@@ -1171,6 +1304,7 @@
     }
     .tunami-right-info-detail-areas{
         margin-left:30px;
+        margin-bottom:5px;
     }
     .tunami-right-info-detail-areas-detail-area{
         font-size:18px;
@@ -1181,10 +1315,21 @@
     .tunami-right-info-detail-areas-type{
         display:inline-block;
         font-size:36px;
-        margin-right:20px;
+        margin-right:15px;
     }
     .tunami-right-info-detail-areas-detail-come{
         font-size:18px;
+    }
+    @media (max-width: 1024px){
+        .tunami-right-info-detail-areas-type{
+            font-size:28px;
+        }
+        .tunami-right-info-detail-areas-detail-area{
+            font-size:14px;
+        }
+        .tunami-right-info-detail-areas-detail-come{
+            font-size:14px;
+        }
     }
     .contents{
         padding:10px;
@@ -1203,6 +1348,14 @@
     }
     .contents-left-explanation-en{
 
+    }
+    @media (max-width: 1024px){
+        .contents-left-explanation-ja{
+            font-size:20px;
+        }
+        .contents-left-explanation-en{
+            font-size:14px
+        }
     }
     .contents-right{
         grid-area:1/2/2/3;
@@ -1224,5 +1377,16 @@
     .recent-quake-right-info-contents-content{
         margin-left:30px;
         font-size:24px;
+    }
+    @media (max-width: 1024px){
+        .recent-quake-right-info-contents-title-ja{
+            font-size:16px;
+        }
+        .recent-quake-right-info-contents-title-en{
+            font-size:12px
+        }
+        .recent-quake-right-info-contents-content{
+            font-size:20px;
+        }
     }
 </style>
