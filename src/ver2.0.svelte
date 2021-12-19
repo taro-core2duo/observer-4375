@@ -1162,7 +1162,8 @@
     }
     .recent-quake-right::-webkit-scrollbar{
         background-color:#ffffff;
-        width:5px;
+        width:10px;
+        height:10px
     }
     .recent-quake-right::-webkit-scrollbar-corner{
         background-color:transparent;
@@ -1172,7 +1173,7 @@
     }
     .recent-quake-right::-webkit-scrollbar-button{
         background-color:#c1c1c1;
-        height:5px;
+        height:10px;
     }
     .distribution{
         grid-area:2/2/3/4;
@@ -1255,7 +1256,8 @@
     }
     .past-quake-right::-webkit-scrollbar{
         background-color:#ffffff;
-        width:5px;
+        width:10px;
+        height:10px;
     }
     .past-quake-right::-webkit-scrollbar-corner{
         background-color:transparent;
@@ -1265,7 +1267,7 @@
     }
     .past-quake-right::-webkit-scrollbar-button{
         background-color:#c1c1c1;
-        height:5px;
+        height:10px;
     }
     .past-quake-right-each-info{
         display:grid;
@@ -1371,7 +1373,8 @@
     }
     .tsunami-right::-webkit-scrollbar{
         background-color:#ffffff;
-        width:5px;
+        width:10px;
+        height:10px;
     }
     .tsunami-right::-webkit-scrollbar-corner{
         background-color:transparent;
@@ -1381,7 +1384,7 @@
     }
     .tsunami-right::-webkit-scrollbar-button{
         background-color:#c1c1c1;
-        height:5px;
+        height:10px;
     }
     .tsunami-right-noTsunami{
         font-size:24px;

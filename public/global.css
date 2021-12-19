@@ -9,18 +9,20 @@ body{
     color: #000000;
     margin:0;
 }
-body::-webkit-scrollbar{
-    width: 12px;
-    background-color: #1e1e1e;
+.body::-webkit-scrollbar{
+    background-color:#ffffff;
+    width:10px;
+    height:10px;
 }
-body::-webkit-scrollbar-track{
-    border-radius: 3px;
-    background-color: transparent;
+.body::-webkit-scrollbar-corner{
+    background-color:transparent;
 }
-body::-webkit-scrollbar-thumb{
-    border-radius:5px;
-    background-color:#a5a5a5;
-    border-radius: 2px;
+.body::-webkit-scrollbar-thumb{
+    background-color:#c1c1c1;
+}
+.body::-webkit-scrollbar-button{
+    background-color:#c1c1c1;
+    height:10px;
 }
 div{
     line-height: 1em;
