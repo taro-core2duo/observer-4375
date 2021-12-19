@@ -915,7 +915,7 @@
                     <div class="past-quake-right-each-info2-magunitude"><span style="font-size:20px;">M</span>{recentQuake.earthquake.hypocenter.magnitude}</div>
                 </div>
                 <div class="past-quake-right-each-info3">
-                    <div class="past-quake-right-each-info3-inner" style="background-color:{convertColor[recentQuake.earthquake.maxScale][0]}; color:{convertColor[recentQuake.earthquake.maxScale][1]};"><span style="font-size:12px;">震度</span>{quakeScale[recentQuake.earthquake.maxScale]}</div>
+                    <div class="past-quake-right-each-info3-inner" style="background-color:{convertColor[recentQuake.earthquake.maxScale][0]}; color:{convertColor[recentQuake.earthquake.maxScale][1]};">{quakeScale[recentQuake.earthquake.maxScale]}</div>
                 </div>                
             </div>
             {/each}
@@ -946,7 +946,7 @@
                     <div class="tunami-right-info-detail-issued recent-quake-right-info-contents-content">発令</div>
                     {#each tsunami.areas as areas}
                     <div class="tunami-right-info-detail-areas">
-                        <div class="tunami-right-info-detail-areas-type" style="border-left:10px solid {tsunami_type[areas.grade][1]}">{tsunami_type[areas.grade][0]}</div>
+                        <div class="tunami-right-info-detail-areas-type" style="border-left:5px solid {tsunami_type[areas.grade][1]}">{tsunami_type[areas.grade][0]}</div>
                         <div class="tunami-right-info-detail-areas-detail">
                             <div class="tunami-right-info-detail-areas-detail-area">{areas.name}</div>
                             {#if areas.immediate == true}
@@ -995,17 +995,33 @@
             grid-area:1/1/2/2;
         } 
     }
+    @media (max-width: 640px){
+        .parent{
+            display:block;
+        }
+    }
     .logo-inner{
         font-size:40px;
         text-align:left;
         margin-left:20px;
+    }
+    @media (max-width: 640px){
+        .logo-inner{
+            margin-left:0px;
+        }
     }
     .EEW-detection{
         grid-area:1/2/2/4;
         display:grid;
         grid-template-columns: 160px;
         position: relative;
-    }@media (max-width: 768px){
+    }
+    @media (max-width: 1024px){
+        .EEW-detection{
+            grid-template-columns: 140px;
+        }
+    }
+    @media (max-width: 768px){
         .EEW-detection{
             grid-area:2/1/3/2;
         } 
@@ -1015,10 +1031,12 @@
             grid-area:2/1/3/2;
         } 
     }
-    @media (max-width: 1024px){
+    @media (max-width: 640px){
         .EEW-detection{
-            grid-template-columns: 140px;
-        }
+            display:grid;
+            grid-template-rows: 100px;
+            grid-template-columns: 100%;
+        } 
     }
     .EEW-detection-left-explanation{
         margin-top:20px !important;
@@ -1037,11 +1055,21 @@
         -webkit-transform : translateY(-50%);
         transform : translateY(-50%);
     }
+    @media (max-width: 640px){
+        .EEW-detection-right-noninfomation{
+            margin-left:0px;
+        }
+    }
     .EEW-detection-right{
         display:grid;
         grid-template-rows:25% 50% 25%;
         margin-left:10px;
         position:relative;
+    }
+    @media (max-width: 640px){
+        .EEW-detection-right{
+            height:100px;
+        }
     }
     .EEW-detection-right-time{
         grid-area:1/1/2/2;
@@ -1081,11 +1109,6 @@
         display:grid;
         grid-template-columns: 150px;
     }
-    @media (max-width: 768px){
-        .recent-quake{
-            grid-area:3/1/4/2;
-        } 
-    }
     @media (max-width: 1024px){
         .recent-quake{
             grid-template-columns: 130px;
@@ -1093,12 +1116,29 @@
     }
     @media (max-width: 768px){
         .recent-quake{
+            grid-area:3/1/4/2;
+        } 
+    }
+    @media (max-width: 768px){
+        .recent-quake{
             grid-template-columns: 140px;
         }
+    }
+    @media (max-width: 640px){
+        .recent-quake{
+            display:grid;
+            grid-template-rows: 100px;
+            grid-template-columns: 100%;
+        } 
     }
     .recent-quake-right-color-bar{
         text-align:right;
         font-size:36px;
+    }
+    @media (max-width: 640px){
+        .recent-quake-right-color-bar{
+            margin-left:0 !important; 
+        } 
     }
     @media (max-width: 1024px){
         .recent-quake-right-color-bar{
@@ -1114,6 +1154,11 @@
     }
     .recent-quake-right{
         overflow-y: scroll;
+    }
+    @media (max-width: 640px){
+        .recent-quake-right{
+            height:400px;
+        } 
     }
     .recent-quake-right::-webkit-scrollbar{
         background-color:#ffffff;
@@ -1134,11 +1179,6 @@
         display:grid;
         grid-template-columns: 150px;
     }
-    @media (max-width: 768px){
-        .distribution{
-            grid-area:4/1/5/2;
-        } 
-    }
     @media (max-width: 1024px){
         .distribution{
             grid-template-columns: 130px;
@@ -1146,8 +1186,20 @@
     }
     @media (max-width: 768px){
         .distribution{
+            grid-area:4/1/5/2;
+        } 
+    }
+    @media (max-width: 768px){
+        .distribution{
             grid-template-columns: 140px;
         }
+    }
+    @media (max-width: 640px){
+        .distribution{
+            display:grid;
+            grid-template-rows: 100px;
+            grid-template-columns: 100%;
+        } 
     }
     .distribution-right-map{
         width:calc(55vw - 140px);
@@ -1159,15 +1211,16 @@
             height:calc(50vh - 25px);
         }
     }
+    @media (max-width: 640px){
+        .distribution-right-map{
+            width:calc(100vw - 50px);
+            height:calc(50vh - 25px);
+        } 
+    }
     .past-quake{
         grid-area:3/1/4/3;
         display:grid;
         grid-template-columns: 150px;
-    }
-    @media (max-width: 768px){
-        .past-quake{
-            grid-area:5/1/6/2;
-        } 
     }
     @media (max-width: 1024px){
         .past-quake{
@@ -1176,12 +1229,29 @@
     }
     @media (max-width: 768px){
         .past-quake{
+            grid-area:5/1/6/2;
+        } 
+    }
+    @media (max-width: 768px){
+        .past-quake{
             grid-template-columns: 140px;
         }
+    }
+    @media (max-width: 640px){
+        .past-quake{
+            display:grid;
+            grid-template-rows: 100px;
+            grid-template-columns: 100%;
+        } 
     }
     .past-quake-right{
         overflow-y:scroll;
         margin-left:10px;
+    }
+    @media (max-width: 640px){
+        .past-quake-right{
+            height:200px;
+        } 
     }
     .past-quake-right::-webkit-scrollbar{
         background-color:#ffffff;
@@ -1202,6 +1272,7 @@
         grid-template-columns:60% 20% 20%;
         justify-content: space-between;
         place-content: end center;
+        margin-top:5px;
     }
     .past-quake-right-each-info1{
         grid-area:1/1/2/2;
@@ -1213,6 +1284,11 @@
     @media (max-width: 1024px){
         .past-quake-right-each-info1-time{
             font-size:16px;
+        }
+    }
+    @media (max-width: 320px){
+        .past-quake-right-each-info1-time{
+            font-size:14px;
         }
     }
     .past-quake-right-each-info2{
@@ -1235,6 +1311,12 @@
             margin-top:10px;
         }
     }
+    @media (max-width: 640px){
+        .past-quake-right-each-info2-magunitude{
+            font-size:24px;
+            margin-top:10px;
+        }
+    }
     .past-quake-right-each-info3{
         grid-area:1/3/3/4;
         text-align:right;
@@ -1244,7 +1326,7 @@
         text-align:left;
         display: inline-block;
         height: calc(100% - 15px);
-        padding:5px 10px 0 5px;
+        padding:5px 10px 5px 10px;
     }
     @media (max-width: 1024px){
         .past-quake-right-each-info3-inner{
@@ -1256,11 +1338,6 @@
         display:grid;
         grid-template-columns: 150px;
     }
-    @media (max-width: 768px){
-        .tsunami{
-            grid-area:6/1/7/2;
-        } 
-    }
     @media (max-width: 1024px){
         .tsunami{
             grid-template-columns: 130px;
@@ -1268,12 +1345,29 @@
     }
     @media (max-width: 768px){
         .tsunami{
+            grid-area:6/1/7/2;
+        } 
+    }
+    @media (max-width: 768px){
+        .tsunami{
             grid-template-columns: 140px;
         }
+    }
+    @media (max-width: 640px){
+        .tsunami{
+            display:grid;
+            grid-template-rows: 100px;
+            grid-template-columns: 100%;
+        } 
     }
     .tsunami-right{
         overflow-y:scroll;
         position: relative;
+    }
+    @media (max-width: 640px){
+        .tsunami-right{
+            height:150px;
+        } 
     }
     .tsunami-right::-webkit-scrollbar{
         background-color:#ffffff;
@@ -1300,7 +1394,11 @@
     }
     .tsunami-right-info{
         margin-left:10px;
-        margin-bottom:15px;
+        margin-bottom:10px;
+        margin-top:5px;
+    }
+    .tunami-right-info-detail-issued{
+        margin-top:5px;
     }
     .tunami-right-info-detail-areas{
         margin-left:30px;
@@ -1338,16 +1436,45 @@
         grid-area:1/1/2/2;
         border-right:2px solid #000000;
     }
+    @media(max-width: 640px){
+        .contents-left{
+            grid-area:1/1/2/2;
+            border-right:none;
+            border-bottom:2px solid #000000;
+            width:100%;
+            display:flex;
+            align-items: center;
+        }
+    }
     .contents-left-explanation{
         margin-top:40px;
         margin-right:10px;
         text-align:right;
     }
+    @media(max-width: 640px){
+        .contents-left-explanation{
+            display:flex;
+            align-items: center;
+            margin:0 !important;
+        }
+    }
     .contents-left-explanation-ja{
         font-size:24px;
     }
+    @media(max-width: 640px){
+        .contents-left-explanation-ja{
+            display:inline-block;
+            margin-right:20px;
+        }
+    }
     .contents-left-explanation-en{
 
+    }
+    @media(max-width: 640px){
+        .contents-left-explanation-en{
+            display:inline-block;
+            text-align: left;
+        }
     }
     @media (max-width: 1024px){
         .contents-left-explanation-ja{
@@ -1359,6 +1486,11 @@
     }
     .contents-right{
         grid-area:1/2/2/3;
+    }
+    @media(max-width: 640px){
+        .contents-right{
+            grid-area:2/1/3/2;
+        }
     }
     .recent-quake-right-contents{
         margin-left:10px;
