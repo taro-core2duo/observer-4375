@@ -1,0 +1,1 @@
+export const confidence = ["A","B","C","D","E"]

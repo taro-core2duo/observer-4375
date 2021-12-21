@@ -158,6 +158,7 @@
                     if(quake[r].points[q].changedScale == "1"){
                         options.markers[q].icon = {}
                         options.markers[q].icon.iconUrl = "/scale/1.png"
+                        options.markers[q].setZIndexOffset = 1000
                     }else if(quake[r].points[q].changedScale == "2"){
                         options.markers[q].icon = {}
                         options.markers[q].icon.iconUrl = "/scale/2.png"
