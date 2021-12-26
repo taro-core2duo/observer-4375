@@ -14,8 +14,10 @@
     import { sample3 } from "./sample3"
     import { sample4 } from "./sample4"
     import { scales_for_map } from "./scales-for-map"
+    import { correct } from "./correct"
     import {LeafletMap, Icon, Marker, TileLayer} from 'svelte-leafletjs';
     import moment from 'moment';
+    import Push from 'push.js'
 
     
     console.log(quakeScale[10])
@@ -573,8 +575,9 @@
         setTimeout(window.location.reload(), 3000)
     };
 
+    userQuakeJson[0] = sample2
     tsunamiJson[0] = sample3[0]
-    Rjson[0] = sample4[3]
+    //Rjson[0] = sample4[6]
     getFirst();
 
     setInterval(function(){
@@ -600,7 +603,7 @@
             console.log(e)
         };
         tsunamiJson[0] = sample3[0]
-        Rjson[0] = sample4[3]
+        //Rjson[0] = sample4[6]
         get()
     },20000);
 
@@ -614,18 +617,23 @@
         }catch(e){
             console.log(e)
         };
+        userQuakeJson[0] = sample2
         get()
     },10000);
 
     let date;
     let nowDate;
+    date = moment();
+    nowDate = Number(date.format('YYYYMMDDHHmmss.sss'))
     const getDate = () => {
         date = moment();
-        nowDate = Number(date.format('YYYYMMDDHHMMSS.SSS'))
+        nowDate = Number(date.format('YYYYMMDDHHmmss'))
+        console.log(date)
+        console.log(nowDate)
+        console.log(moment(nowDate, "YYYYMMDDHHmmss").diff(moment(userQuakeJson[0].updated_at.replace(/\/|:|\s/g,""), "YYYYMMDDHHmmss.sss"), "seconds"))
     }
-    setInterval( getDate() , 1000 )
-    console.log(date)
-    console.log(nowDate)
+    setInterval(getDate,1000)
+    
     
     onMount(() => {
         const RecentQuake = document.getElementById("RecentQuake")
@@ -670,6 +678,7 @@
     let leafletMap;
     
     console.log(Number(userQuakeJson[0].updated_at.replace(/\/|:|\s/g,"")))
+
 </script>
 
 <div class="parent">
@@ -684,7 +693,7 @@
             </div>
         </div>
         <div class="EEW-detection-right contents-right">
-            {#if userQuakeJson[0].confidence != 0 && (moment(nowDate, "YYYYMMDDHHSS.SSS").diff(moment(userQuakeJson[0].updated_at.replace(/\/|:|\s/g,""), "YYYYMMDDHHSS.SSS"), "minutes") <= 5 )}
+            {#if userQuakeJson[0].confidence != 0 && (moment(nowDate, "YYYYMMDDHHmmss.sss").diff(moment(userQuakeJson[0].updated_at.replace(/\/|:|\s/g,""), "YYYYMMDDHHmmss.sss"), "seconds") <= 300 ) && (moment(nowDate, "YYYYMMDDHHmmss.sss").diff(moment(userQuakeJson[0].updated_at.replace(/\/|:|\s/g,""), "YYYYMMDDHHmmss.sss"), "seconds") >= 0 )}
                 <div class="EEW-detection-right-time">{userQuakeJson[0].updated_at}</div>
                 <div class="EEW-detection-right-happen">地震発生の可能性</div>
                 <div class="EEW-detection-right-area">
@@ -713,6 +722,9 @@
         </div>
         <div class="recent-quake-right contents-right">
             {#if (quake[0].type == "DetailScale")}
+            {#if (Rjson[0].issue.correct !== "None")}
+            <div class="recent-quake-right-correct">訂正報　{correct[Rjson[0].issue.correct]}に関して</div>
+            {/if}
             <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{convertColor[Rjson[0].earthquake.maxScale][0]}; color:{convertColor[Rjson[0].earthquake.maxScale][1]};">{quake[0].maxScale}</div>
             <div class="recent-quake-right-info recent-quake-right-contents">
                 <div class="recent-quake-right-info-time recent-quake-right-info-contents">
@@ -761,6 +773,9 @@
                 </div>
             </div>
             {:else if (quake[0].type == "Destination")}
+            {#if (Rjson[0].issue.correct !== "None")}
+            <div class="recent-quake-right-correct">訂正報　{correct[Rjson[0].issue.correct]}に関して</div>
+            {/if}
             <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{convertColor[Rjson[0].earthquake.maxScale][0]}; color:{convertColor[Rjson[0].earthquake.maxScale][1]};">{quake[0].maxScale}</div>
             <div class="recent-quake-right-info recent-quake-right-contents">
                 <div class="recent-quake-right-info-time recent-quake-right-info-contents">
@@ -800,6 +815,9 @@
                 </div>
             </div>
             {:else if (quake[0].type == "ScalePrompt")}
+            {#if (Rjson[0].issue.correct !== "None")}
+            <div class="recent-quake-right-correct">訂正報　{correct[Rjson[0].issue.correct]}に関して</div>
+            {/if}
             <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{convertColor[Rjson[0].earthquake.maxScale][0]}; color:{convertColor[Rjson[0].earthquake.maxScale][1]};">{quake[0].maxScale}</div>
             <div class="recent-quake-right-info recent-quake-right-contents">
                 <div class="recent-quake-right-info-time recent-quake-right-info-contents">
@@ -969,7 +987,6 @@
 </div>
 
 
-
 <style>
     .parent{
         width:calc(100vw - 20px);
@@ -1073,10 +1090,19 @@
     }
     .EEW-detection-right-time{
         grid-area:1/1/2/2;
+        margin-top:5px;
+        font-size:20px;
     }
     .EEW-detection-right-happen{
         grid-area:2/1/3/2;
-        font-size:40px;
+        font-size:36px;
+        margin-top:5px;
+        color:#FF7800;
+    }
+    @media (max-width: 768px){
+        .EEW-detection-right-happen{
+            font-size:34px;
+        } 
     }
     .EEW-detection-right-area{
         grid-area:3/1/4/2;
@@ -1130,6 +1156,29 @@
             grid-template-rows: 100px;
             grid-template-columns: 100%;
         } 
+    }
+    .recent-quake-right-correct{
+        margin-left:10px;
+        font-size:20px;
+        background:#000000;
+        color:#ffffff;
+        padding-top:5px;
+    }
+    @media (max-width: 1024px){
+        .recent-quake-right-correct{
+            font-size:15px;
+        }
+    }
+    @media (max-width: 768px){
+        .recent-quake-right-correct{
+            font-size:20px;
+        }
+    }
+    @media (max-width: 640px){
+        .recent-quake-right-correct{
+            font-size:18px;
+            margin:0 !important;
+        }
     }
     .recent-quake-right-color-bar{
         text-align:right;
