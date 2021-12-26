@@ -2,7 +2,7 @@
     import Router from 'svelte-spa-router';
 
     import Home from "./home.svelte"
-    import Ver2 from './ver2.0.svelte';
+    import Ver2 from './ver2.0.svelte'
 
     const routes = {
 		'/home': Home,

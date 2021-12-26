@@ -82,7 +82,7 @@ export const sample2 = {
     "id": "61b491c0adc2d40dc85f6c5d",
     "started_at": "2021/12/11 20:54:10.746",
     "time": "2021/12/11 20:55:44.841",
-    "updated_at": "2021/12/11 20:55:44.756",
+    "updated_at": "2021/12/26 13:26:44.756",
     "user-agent": "userquake-aggregator 20200713",
     "ver": "20200713",
     "confLevel": "レベル4",
