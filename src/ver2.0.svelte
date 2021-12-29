@@ -13,11 +13,11 @@
     import { sample2 } from "./sample2"
     import { sample3 } from "./sample3"
     import { sample4 } from "./sample4"
+    import { prompt } from "./prompt"
     import { scales_for_map } from "./scales-for-map"
     import { correct } from "./correct"
     import {LeafletMap, Icon, Marker, TileLayer} from 'svelte-leafletjs';
     import moment from 'moment';
-    import Push from 'push.js'
 
     
     let pointLength = pointData.length
@@ -144,6 +144,32 @@
                 quake[e].magnitude = info.earthquake.hypocenter.magnitude
                 quake[e].name = info.earthquake.hypocenter.name
                 quake[e].depth = info.earthquake.hypocenter.depth
+            }else if (info.code == 551 && info.issue.type == "ScaleAndDestination"){
+                quake[e] = {}
+                quake[e].type = "ScaleAndDestination"
+                quake[e].time = info.earthquake.time
+                let scaleTsunami = info.earthquake.domesticTsunami
+                quake[e].domesticTsunami = domesticTsunami[scaleTsunami]
+                quake[e].lat = info.earthquake.hypocenter.latitude
+                quake[e].lon = info.earthquake.hypocenter.longitude
+                quake[e].magnitude = info.earthquake.hypocenter.magnitude
+                quake[e].name = info.earthquake.hypocenter.name
+                quake[e].depth = info.earthquake.hypocenter.depth
+                if(info.points.length !== 0){
+                    quake[e].points = info.points
+                    for(let i = 0; i < info.points.length; i++){
+                        let pointsScale = info.points[i].scale
+                        let changed = quakeScale[pointsScale]
+                        quake[e].points[i].changedScale = changed
+                        for(let o = 0; o < areaNameLength; o++){
+                            if(areaName[o].area == info.points[i].addr){
+                                quake[e].points[i].lat = areaName[o].lat
+                                quake[e].points[i].lon = areaName[o].lon
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
         console.log(quake)
@@ -300,6 +326,32 @@
                 quake[e].magnitude = info.earthquake.hypocenter.magnitude
                 quake[e].name = info.earthquake.hypocenter.name
                 quake[e].depth = info.earthquake.hypocenter.depth
+            }else if (info.code == 551 && info.issue.type == "ScaleAndDestination"){
+                quake[e] = {}
+                quake[e].type = "ScaleAndDestination"
+                quake[e].time = info.earthquake.time
+                let scaleTsunami = info.earthquake.domesticTsunami
+                quake[e].domesticTsunami = domesticTsunami[scaleTsunami]
+                quake[e].lat = info.earthquake.hypocenter.latitude
+                quake[e].lon = info.earthquake.hypocenter.longitude
+                quake[e].magnitude = info.earthquake.hypocenter.magnitude
+                quake[e].name = info.earthquake.hypocenter.name
+                quake[e].depth = info.earthquake.hypocenter.depth
+                if(info.points.length !== 0){
+                    quake[e].points = info.points
+                    for(let i = 0; i < info.points.length; i++){
+                        let pointsScale = info.points[i].scale
+                        let changed = quakeScale[pointsScale]
+                        quake[e].points[i].changedScale = changed
+                        for(let o = 0; o < areaNameLength; o++){
+                            if(areaName[o].area == info.points[i].addr){
+                                quake[e].points[i].lat = areaName[o].lat
+                                quake[e].points[i].lon = areaName[o].lon
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
         console.log(quake)
@@ -351,7 +403,7 @@
 
     try{
         apiHttps = new XMLHttpRequest();
-        apiHttps.open("GET", "https://api.p2pquake.net/v2/history?codes=551&limit=2", false);
+        apiHttps.open("GET", "https://api.p2pquake.net/v2/history?codes=551&limit=2&offset=2", false);
         apiHttps.onreadystatechange = function(){
             if(this.readyState === 4 && this.status === 200){
                 console.log("success")
@@ -380,7 +432,7 @@
         lastQuakeJson = JSON.parse(lastQuakeLog);
 
         const userQuake = new XMLHttpRequest();
-        userQuake.open("GET", "https://api.p2pquake.net/v2/history?codes=9611&limit=1", false);
+        userQuake.open("GET", "https://api.p2pquake.net/v2/history?codes=9611&limit=2", false);
         userQuake.onreadystatechange = function(){
             if(this.readyState === 4 && this.status === 200){
                 console.log("success")
@@ -413,12 +465,13 @@
     //userQuakeJson[0] = sample2
     //tsunamiJson[0] = sample3[0]
     //Rjson[0] = sample4[6]
+    Rjson[0] = prompt[2]
     getFirst();
 
     setInterval(function(){
         try{
             apiHttps = new XMLHttpRequest();
-            apiHttps.open("GET", "https://api.p2pquake.net/v2/history?codes=551&limit=2", false);
+            apiHttps.open("GET", "https://api.p2pquake.net/v2/history?codes=551&limit=2&offset=2", false);
             apiHttps.send();
             const log = apiHttps.responseText;
             Rjson = JSON.parse(log);
@@ -444,6 +497,7 @@
         };
         //tsunamiJson[0] = sample3[0]
         //Rjson[0] = sample4[6]
+        Rjson[0] = prompt[2]
         get()
     },20000);
 
@@ -504,17 +558,22 @@
 
     let sumlat = 0;
     let sumlon = 0;
-    for(let i = 0; i < data_for_map.points.length; i++){
-        let replacedLat = data_for_map.points[i].lat/data_for_map.points.length
-        let replacedLon = data_for_map.points[i].lon/data_for_map.points.length
-        sumlat += replacedLat
-        sumlon += replacedLon
+    let noHypocenter;
+    if(data_for_map.type == "ScalePrompt"){
+        for(let i = 0; i < data_for_map.points.length; i++){
+            let replacedLat = data_for_map.points[i].lat
+            let replacedLon = data_for_map.points[i].lon
+            sumlat += Number(replacedLat)
+            sumlon += Number(replacedLon)
+        }
+        console.log(sumlat,sumlon)
+        noHypocenter =  {
+            center: [sumlat / Number(data_for_map.points.length),sumlon / Number(data_for_map.points.length)],
+            zoom: 7,
+        }
     }
-
-    const noHypocenter = {
-        center: [Math.floor(sumlat * Math.pow(10,3))/Math.pow(10,3),Math.floor(sumlon * Math.pow(10,3))/Math.pow(10,3)],
-        zoom: 7,
-    }
+    
+    
 
     let leafletMap;
     
@@ -525,6 +584,12 @@
 <div class="parent">
     <div class="logo contents">
         <div class="logo-inner">observer<br>4375</div>
+        <div class="github">
+            <a href="https://github.com/taro-core2duo/observer-4375">
+                <img src="GitHub-Mark-64px.png" alt="github" class="github-img">
+                <p class="github-text">github</p>
+            </a>
+        </div>
     </div>
     <div class="EEW-detection contents">
         <div class="EEW-detection-left contents-left">
@@ -617,7 +682,7 @@
             {#if (Rjson[0].issue.correct !== "None")}
             <div class="recent-quake-right-correct">訂正報　{correct[Rjson[0].issue.correct]}に関して</div>
             {/if}
-            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{convertColor[Rjson[0].earthquake.maxScale][0]}; color:{convertColor[Rjson[0].earthquake.maxScale][1]};">{quake[0].maxScale}</div>
+            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{convertColor[Rjson[1].earthquake.maxScale][0]}; color:{convertColor[Rjson[1].earthquake.maxScale][1]};">{quake[1].maxScale}</div>
             <div class="recent-quake-right-info recent-quake-right-contents">
                 <div class="recent-quake-right-info-time recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-time-title-ja recent-quake-right-info-contents-title-ja">時刻</div>
@@ -669,7 +734,7 @@
                 <div class="recent-quake-right-info-intensity recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-intensity-title-ja recent-quake-right-info-contents-title-ja">最大震度</div>
                     <div class="recent-quake-right-info-intensity-title-en recent-quake-right-info-contents-title-en">max intensity</div>
-                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{quake[1].maxScale}</div>
+                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{quake[0].maxScale}</div>
                 </div>
                 <div class="recent-quake-right-info-magunitude recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-magunitude-title-ja recent-quake-right-info-contents-title-ja">マグニチュード</div>
@@ -709,13 +774,13 @@
         </div>
         <div class="distribution-right contents-right">
             <div class="distribution-right-map">
-                {#if data_for_map.type == "DetailScale" | data_for_map.type == "ScalePrompt"}
+                {#if data_for_map.type == "DetailScale"}
                 <LeafletMap bind:this={leafletMap} options={mapOptions}>
                     <TileLayer url={tileUrl} options={tileLayerOptions}/>
                     {#each data_for_map.points as point}
                         {#each scales_for_map as scales}
                             {#if point.scale == scales[0]}
-                            {#if point.lat != null || point.lon != null}
+                            {#if point.lat !== null || point.lon !== null}
                                 <Marker latLng={[point.lat, point.lon]} zIndexOffset={scales[2]}>
                                     <Icon options={scales[1]}/>
                                 </Marker>
@@ -723,31 +788,43 @@
                             {/if}
                         {/each}
                     {/each}
-                    {#if (data_for_map.type == "DetailScale")}
-                        {#if data_for_map.lat != null || data_for_map.lon != null}
+                    {#if data_for_map.lat !== null || data_for_map.lon !== null}
                         <Marker latLng={[data_for_map.lat, data_for_map.lon]} zIndexOffset={5000}>
                             <Icon options={iconOptions}/>
                         </Marker>
-                        {/if}
-                    {:else if (data_for_map.type == "ScalePrompt")}
-                        {#if data_for_map2.lat != null || data_for_map2.lon != null}
-                        <Marker latLng={[data_for_map2.lat, data_for_map2.lon]} zIndexOffset={5000}>
-                            <Icon options={iconOptions}/>
-                        </Marker>
-                        {/if}
                     {/if}
                 </LeafletMap>
                 {:else if data_for_map.type == "Destination"}
+                <LeafletMap bind:this={leafletMap} options={mapOptions}>
+                    <TileLayer url={tileUrl} options={tileLayerOptions}/>
+                    {#each data_for_map2.points as point}
+                        {#each scales_for_map as scales}
+                            {#if point.scale == scales[0]}
+                            {#if point.lat !== null || point.lon !== null}
+                                <Marker latLng={[point.lat, point.lon]} zIndexOffset={scales[2]}>
+                                    <Icon options={scales[1]}/>
+                                </Marker>
+                            {/if}
+                            {/if}
+                        {/each}
+                    {/each}
+                    {#if data_for_map.lat !== null || data_for_map.lon !== null}
+                        <Marker latLng={[data_for_map.lat, data_for_map.lon]} zIndexOffset={5000}>
+                            <Icon options={iconOptions}/>
+                        </Marker>
+                    {/if}
+                </LeafletMap>
+                {:else if data_for_map.type == "ScalePrompt"}
                 <LeafletMap bind:this={leafletMap} options={noHypocenter}>
                     <TileLayer url={tileUrl} options={tileLayerOptions}/>
                     {#each data_for_map.points as point}
                         {#each scales_for_map as scales}
                             {#if point.scale == scales[0]}
-                                {#if point.lat !== null || point.lon !== null}
+                            {#if point.lat !== null || point.lon !== null}
                                 <Marker latLng={[point.lat, point.lon]} zIndexOffset={scales[2]}>
                                     <Icon options={scales[1]}/>
                                 </Marker>
-                                {/if}
+                            {/if}
                             {/if}
                         {/each}
                     {/each}
@@ -855,6 +932,9 @@
     }
     .logo{
         grid-area:1/1/2/2;
+        display:flex;
+        justify-content: flex-start;
+        align-items: flex-end;
     }
     @media (max-width: 930px){
         .logo{
@@ -880,6 +960,13 @@
         .logo-inner{
             margin-left:0px;
         }
+    }
+    .github-img{
+        width:32px;
+        height:32px;
+    }
+    .github-text{
+        font-size:14px;
     }
     .EEW-detection{
         grid-area:1/2/2/4;
