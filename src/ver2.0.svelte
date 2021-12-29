@@ -4,362 +4,186 @@
     import { areaName } from "./areaName"
     import { domesticTsunami } from "./domesticTsuname"
     import { epsp_area } from "./epsp-area"
-    import { convertColor } from "./convertColor"
+    import { convertColor , change_color_intensity } from "./convertColor"
     import { tsunami_type } from "./tsunami-type"
     import { changeArray } from "./changeArray"
     import { convertScales } from "./convertScales"
     import { confidence} from "./confidence"
+    import { city } from "./city"
     import { sample1 } from "./sample1"
     import { sample2 } from "./sample2"
     import { sample3 } from "./sample3"
     import { sample4 } from "./sample4"
     import { prompt } from "./prompt"
+    import { chiba } from "./chiba"
+    import { foreign } from "./foreign"
+    import { wakayama } from "./wakayama"
     import { scales_for_map } from "./scales-for-map"
     import { correct } from "./correct"
     import {LeafletMap, Icon, Marker, TileLayer} from 'svelte-leafletjs';
     import moment from 'moment';
-
-    
-    let pointLength = pointData.length
-
-    let areaNameLength = areaName.length
-    
     import { onMount } from "svelte";
 
 
-    let quake = []
-
-    const getFirst = () => {
-        console.log(Rjson)
-        let length = Rjson.length
-        for(let e = 0; e < length; e++){
-            let info = Rjson[e]
-            if(info.code == 551 && info.issue.type == "DetailScale"){
-                quake[e] = {}
-                quake[e].type = "DetailScale"
-                let scaleTsunami = info.earthquake.domesticTsunami
-                quake[e].domesticTsunami = domesticTsunami[scaleTsunami]
-                quake[e].location = info.earthquake.hypocenter.name
-                quake[e].magnitude = info.earthquake.hypocenter.magnitude
-                quake[e].lat = info.earthquake.hypocenter.latitude
-                quake[e].lon = info.earthquake.hypocenter.longitude
-                quake[e].depth = info.earthquake.hypocenter.depth
-                let scale = info.earthquake.maxScale
-                quake[e].maxScale = quakeScale[scale]
-                quake[e].time = info.earthquake.time
-                quake[e].detailLength = info.points.length
-                quake[e].points = info.points
-                quake[e].arrayScale = {}
-                quake[e].arrayScale2 = {}
-                for(let f = 0; f < 9; f++){
-                    quake[e].arrayScale[f] = []
-                    quake[e].arrayScale2[f] = []
-                }
-                let scale1 = 0;
-                let scale2 = 0;
-                let scale3 = 0;
-                let scale4 = 0;
-                let scale45 = 0;
-                let scale5 = 0;
-                let scale55 = 0;
-                let scale6 = 0;
-                let scale7 = 0;
-                for(let i = 0; i < info.points.length; i++){
-                    let pointsScale = info.points[i].scale
-                    let changed = quakeScale[pointsScale]
-                    quake[e].points[i].changedScale = changed
-                    for(let o = 0; o < pointLength; o++){
-                        if(pointData[o].name == info.points[i].addr){
-                            quake[e].points[i].lat = pointData[o].lat
-                            quake[e].points[i].lon = pointData[o].lon
-                            quake[e].points[i].city = pointData[o].city.name
-                            quake[e].points[i].pref = pointData[o].pref.name
-                            break;
-                        }else{}
-                        if(quake[e].points[i].city == undefined){
-                            quake[e].points[i].city = "データなし"
-                        }
-                    }
-                    if(info.points[i].changedScale == "1"){
-                        quake[e].arrayScale[0][scale1] = info.points[i].pref + " " + info.points[i].city
-                        scale1++
-                    }else if(info.points[i].changedScale == "2"){
-                        quake[e].arrayScale[1][scale2] = info.points[i].pref + " " + info.points[i].city
-                        scale2++
-                    }else if(info.points[i].changedScale == "3"){
-                        quake[e].arrayScale[2][scale3] = info.points[i].pref + " " + info.points[i].city
-                        scale3++
-                    }else if(info.points[i].changedScale == "4"){
-                        quake[e].arrayScale[3][scale4] = info.points[i].pref + " " + info.points[i].city
-                        scale4++
-                    }else if(info.points[i].changedScale == "5弱"){
-                        quake[e].arrayScale[4][scale45] = info.points[i].pref + " " + info.points[i].city
-                        scale45++
-                    }else if(info.points[i].changedScale == "5強"){
-                        quake[e].arrayScale[5][scale5] = info.points[i].pref + " " + info.points[i].city
-                        scale5++
-                    }else if(info.points[i].changedScale == "6弱"){
-                        quake[e].arrayScale[6][scale55] = info.points[i].pref + " " + info.points[i].city
-                        scale55++
-                    }else if(info.points[i].changedScale == "6強"){
-                        quake[e].arrayScale[7][scale6] = info.points[i].pref + " " + info.points[i].city
-                        scale6++
-                    }else if(info.points[i].changedScale == "7"){
-                        quake[e].arrayScale[8][scale7] = info.points[i].pref + " " + info.points[i].city
-                        scale7++
-                    }
-                    for(let i = 0; i < 8; i++){
-                        quake[e].arrayScale2[i] = Array.from(new Set(quake[e].arrayScale[i]))
-                    }
-                }
-            }else if(info.code == 551 && info.issue.type == "ScalePrompt"){
-                quake[e] = {}
-                quake[e].type = "ScalePrompt"
-                let scale = info.earthquake.maxScale
-                quake[e].maxScale = quakeScale[scale]
-                quake[e].time = info.earthquake.time
-                let scaleTsunami = info.earthquake.domesticTsunami
-                quake[e].domesticTsunami = domesticTsunami[scaleTsunami]
-                quake[e].points = info.points
-                for(let i = 0; i < info.points.length; i++){
-                    let pointsScale = info.points[i].scale
-                    let changed = quakeScale[pointsScale]
-                    quake[e].points[i].changedScale = changed
-                    for(let o = 0; o < areaNameLength; o++){
-                        if(areaName[o].area == info.points[i].addr){
-                            quake[e].points[i].lat = areaName[o].lat
-                            quake[e].points[i].lon = areaName[o].lon
-                            break;
-                        }
-                    }
-                }
-            }else if(info.code == 551 && info.issue.type == "Destination"){
-                quake[e] = {}
-                quake[e].type = "Destination"
-                quake[e].time = info.earthquake.time
-                let scaleTsunami = info.earthquake.domesticTsunami
-                quake[e].domesticTsunami = domesticTsunami[scaleTsunami]
-                quake[e].lat = info.earthquake.hypocenter.latitude
-                quake[e].lon = info.earthquake.hypocenter.longitude
-                quake[e].magnitude = info.earthquake.hypocenter.magnitude
-                quake[e].name = info.earthquake.hypocenter.name
-                quake[e].depth = info.earthquake.hypocenter.depth
-            }else if (info.code == 551 && info.issue.type == "ScaleAndDestination"){
-                quake[e] = {}
-                quake[e].type = "ScaleAndDestination"
-                quake[e].time = info.earthquake.time
-                let scaleTsunami = info.earthquake.domesticTsunami
-                quake[e].domesticTsunami = domesticTsunami[scaleTsunami]
-                quake[e].lat = info.earthquake.hypocenter.latitude
-                quake[e].lon = info.earthquake.hypocenter.longitude
-                quake[e].magnitude = info.earthquake.hypocenter.magnitude
-                quake[e].name = info.earthquake.hypocenter.name
-                quake[e].depth = info.earthquake.hypocenter.depth
-                if(info.points.length !== 0){
-                    quake[e].points = info.points
-                    for(let i = 0; i < info.points.length; i++){
-                        let pointsScale = info.points[i].scale
-                        let changed = quakeScale[pointsScale]
-                        quake[e].points[i].changedScale = changed
-                        for(let o = 0; o < areaNameLength; o++){
-                            if(areaName[o].area == info.points[i].addr){
-                                quake[e].points[i].lat = areaName[o].lat
-                                quake[e].points[i].lon = areaName[o].lon
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        console.log(quake)
-        
-        //lastJson = apiHttps.responseText
-        console.log(userQuakeJson)
-        for(let i = 0; i < userQuakeJson.length; i++){
-            let conf = userQuakeJson[i].confidence
-            userQuakeJson[i].confLevel = {}
-            userQuakeJson[i].area_conf = Object.entries(userQuakeJson[i].area_confidences)
-            if( conf >= 0 && conf < 0.96774 ){
-                userQuakeJson[i].confLevel = "レベル0"
-            }else if( conf >= 0.96774 && conf < 0.97015 ){
-                userQuakeJson[i].confLevel = "レベル1"
-            }else if( conf >= 0.97015 && conf < 0.97024){
-                userQuakeJson[i].confLevel = "レベル2"
-            }else if( conf >= 0.97024 && conf < 0.98052 ){
-                userQuakeJson[i].confLevel = "レベル3"
-            }else if( conf >= 0.98052 ){
-                userQuakeJson[i].confLevel = "レベル4"
-            }
-            for(let e = 0; e < userQuakeJson[i].area_conf.length; e++){
-                let area = userQuakeJson[i].area_conf[e][0]
-                userQuakeJson[i].area_conf[e][2] = {}
-                for(let x = 0; x < epsp_area.length; x++){
-                    if( area == epsp_area[x]["地域コード(数値型)"]){
-                        userQuakeJson[i].area_conf[e][2] = epsp_area[x]["地域"]
-                    }
-                }
-            }
-        }
-        for(let i = 0; i < userQuakeJson.length; i++){
-            if(userQuakeJson[i].confidence !== 0){
-                judgeZero = i
-                break
-            }
-            judgeZero = i
-        }
-        console.log(judgeZero)
-    };
+    //let quake = []
 
     const get = () => {
         console.log(Rjson)
-        let length = Rjson.length
-        for(let e = 0; e < length; e++){
+        for(let e = 0; e < Rjson.length; e++){
             let info = Rjson[e]
+            //各地の震度に関する情報の場合
             if(info.code == 551 && info.issue.type == "DetailScale"){
-                quake[e] = {}
-                quake[e].type = "DetailScale"
-                let scaleTsunami = info.earthquake.domesticTsunami
-                quake[e].domesticTsunami = domesticTsunami[scaleTsunami]
-                quake[e].location = info.earthquake.hypocenter.name
-                quake[e].magnitude = info.earthquake.hypocenter.magnitude
-                quake[e].lat = info.earthquake.hypocenter.latitude
-                quake[e].lon = info.earthquake.hypocenter.longitude
-                quake[e].depth = info.earthquake.hypocenter.depth
-                let scale = info.earthquake.maxScale
-                quake[e].maxScale = quakeScale[scale]
-                quake[e].time = info.earthquake.time
-                quake[e].detailLength = info.points.length
-                quake[e].points = info.points
-                quake[e].arrayScale = {}
-                quake[e].arrayScale2 = {}
-                for(let f = 0; f < 9; f++){
-                    quake[e].arrayScale[f] = []
-                    quake[e].arrayScale2[f] = []
-                }
-                let scale1 = 0;
-                let scale2 = 0;
-                let scale3 = 0;
-                let scale4 = 0;
-                let scale45 = 0;
-                let scale5 = 0;
-                let scale55 = 0;
-                let scale6 = 0;
-                let scale7 = 0;
+                //国内での津波の有無を日本語化
+                info.earthquake.domesticTsunami_ja = domesticTsunami[info.earthquake.domesticTsunami]
+                //最大震度を日本語化
+                info.earthquake.maxScale_ja = quakeScale[info.earthquake.maxScale]
                 for(let i = 0; i < info.points.length; i++){
-                    let pointsScale = info.points[i].scale
-                    let changed = quakeScale[pointsScale]
-                    quake[e].points[i].changedScale = changed
-                    for(let o = 0; o < pointLength; o++){
+                    //各地の震度を日本語化
+                    info.points[i].scale_changed = quakeScale[info.points[i].scale]
+                    //震度観測点の座標を追加
+                    //市区町村名、都道府県名を追加
+                    for(let o = 0; o < pointData.length; o++){
                         if(pointData[o].name == info.points[i].addr){
-                            quake[e].points[i].lat = pointData[o].lat
-                            quake[e].points[i].lon = pointData[o].lon
-                            quake[e].points[i].city = pointData[o].city.name
-                            quake[e].points[i].pref = pointData[o].pref.name
+                            info.points[i].lat = pointData[o].lat
+                            info.points[i].lon = pointData[o].lon
+                            info.points[i].city = pointData[o].city.name
+                            info.points[i].pref = pointData[o].pref.name
                             break;
-                        }else{}
-                        if(quake[e].points[i].city == undefined){
-                            quake[e].points[i].city = "データなし"
                         }
-                    }
-                    if(info.points[i].changedScale == "1"){
-                        quake[e].arrayScale[0][scale1] = info.points[i].pref + " " + info.points[i].city
-                        scale1++
-                    }else if(info.points[i].changedScale == "2"){
-                        quake[e].arrayScale[1][scale2] = info.points[i].pref + " " + info.points[i].city
-                        scale2++
-                    }else if(info.points[i].changedScale == "3"){
-                        quake[e].arrayScale[2][scale3] = info.points[i].pref + " " + info.points[i].city
-                        scale3++
-                    }else if(info.points[i].changedScale == "4"){
-                        quake[e].arrayScale[3][scale4] = info.points[i].pref + " " + info.points[i].city
-                        scale4++
-                    }else if(info.points[i].changedScale == "5弱"){
-                        quake[e].arrayScale[4][scale45] = info.points[i].pref + " " + info.points[i].city
-                        scale45++
-                    }else if(info.points[i].changedScale == "5強"){
-                        quake[e].arrayScale[5][scale5] = info.points[i].pref + " " + info.points[i].city
-                        scale5++
-                    }else if(info.points[i].changedScale == "6弱"){
-                        quake[e].arrayScale[6][scale55] = info.points[i].pref + " " + info.points[i].city
-                        scale55++
-                    }else if(info.points[i].changedScale == "6強"){
-                        quake[e].arrayScale[7][scale6] = info.points[i].pref + " " + info.points[i].city
-                        scale6++
-                    }else if(info.points[i].changedScale == "7"){
-                        quake[e].arrayScale[8][scale7] = info.points[i].pref + " " + info.points[i].city
-                        scale7++
-                    }
-                    for(let i = 0; i < 8; i++){
-                        quake[e].arrayScale2[i] = Array.from(new Set(quake[e].arrayScale[i]))
-                    }
-                }
-            }else if(info.code == 551 && info.issue.type == "ScalePrompt"){
-                quake[e] = {}
-                quake[e].type = "ScalePrompt"
-                let scale = info.earthquake.maxScale
-                quake[e].maxScale = quakeScale[scale]
-                quake[e].time = info.earthquake.time
-                let scaleTsunami = info.earthquake.domesticTsunami
-                quake[e].domesticTsunami = domesticTsunami[scaleTsunami]
-                quake[e].points = info.points
-                for(let i = 0; i < info.points.length; i++){
-                    let pointsScale = info.points[i].scale
-                    let changed = quakeScale[pointsScale]
-                    quake[e].points[i].changedScale = changed
-                    for(let o = 0; o < areaNameLength; o++){
-                        if(areaName[o].area == info.points[i].addr){
-                            quake[e].points[i].lat = areaName[o].lat
-                            quake[e].points[i].lon = areaName[o].lon
-                            break;
+                        //データがない場合の処理
+                        if(info.points[i].city == undefined){
+                            info.points[i].city = "データなし"
+                        }
+                        if(info.points[i].pref == undefined){
+                            info.poinrs[i].pref = "データなし"
                         }
                     }
                 }
-            }else if(info.code == 551 && info.issue.type == "Destination"){
-                quake[e] = {}
-                quake[e].type = "Destination"
-                quake[e].time = info.earthquake.time
-                let scaleTsunami = info.earthquake.domesticTsunami
-                quake[e].domesticTsunami = domesticTsunami[scaleTsunami]
-                quake[e].lat = info.earthquake.hypocenter.latitude
-                quake[e].lon = info.earthquake.hypocenter.longitude
-                quake[e].magnitude = info.earthquake.hypocenter.magnitude
-                quake[e].name = info.earthquake.hypocenter.name
-                quake[e].depth = info.earthquake.hypocenter.depth
-            }else if (info.code == 551 && info.issue.type == "ScaleAndDestination"){
-                quake[e] = {}
-                quake[e].type = "ScaleAndDestination"
-                quake[e].time = info.earthquake.time
-                let scaleTsunami = info.earthquake.domesticTsunami
-                quake[e].domesticTsunami = domesticTsunami[scaleTsunami]
-                quake[e].lat = info.earthquake.hypocenter.latitude
-                quake[e].lon = info.earthquake.hypocenter.longitude
-                quake[e].magnitude = info.earthquake.hypocenter.magnitude
-                quake[e].name = info.earthquake.hypocenter.name
-                quake[e].depth = info.earthquake.hypocenter.depth
-                if(info.points.length !== 0){
-                    quake[e].points = info.points
+                //震度ごとに整理
+                info.arrayScale = {}
+                info.arrayScale2 = {}
+                for(let f = 0; f < 11; f++){
+                    info.arrayScale[f] = []
+                    info.arrayScale2[f] = []
+                    //この際は「都道府県名　市区町村名」で保存
                     for(let i = 0; i < info.points.length; i++){
-                        let pointsScale = info.points[i].scale
-                        let changed = quakeScale[pointsScale]
-                        quake[e].points[i].changedScale = changed
-                        for(let o = 0; o < areaNameLength; o++){
-                            if(areaName[o].area == info.points[i].addr){
-                                quake[e].points[i].lat = areaName[o].lat
-                                quake[e].points[i].lon = areaName[o].lon
-                                break;
+                        if(info.points[i].scale_changed == convertScales[f]){
+                            info.arrayScale[f].push(info.points[i].pref + " " + info.points[i].city)
+                        }
+                    }
+                    //重複を削除
+                    info.arrayScale2[f] = Array.from(new Set(info.arrayScale[f]))
+                }
+            //震度速報の場合    
+            }else if(info.code == 551 && info.issue.type == "ScalePrompt"){
+                //最大震度を日本語化
+                info.earthquake.maxScale_ja = quakeScale[info.earthquake.maxScale]
+                //国内での津波の有無を日本語化
+                info.earthquake.domesticTsunami = domesticTsunami[info.earthquake.domesticTsunami]
+                for(let i = 0; i < info.points.length; i++){
+                    //震度を日本語化
+                    info.points[i].scale_changed = quakeScale[info.points[i].scale]
+                    for(let o = 0; o < areaName.length; o++){
+                        if(areaName[o].area == info.points[i].addr){
+                            //震度観測点の座標を追加
+                            info.points[i].lat = areaName[o].lat
+                            info.points[i].lon = areaName[o].lon
+                            break;
+                        }
+                    }
+                }
+                //震度ごとに整理
+                info.arrayScale = {}
+                info.arrayScale2 = {}
+                for(let f = 0; f < 11; f++){
+                    info.arrayScale[f] = []
+                    info.arrayScale2[f] = []
+                    //この際は「都道府県名　市区町村名」で保存
+                    for(let i = 0; i < info.points.length; i++){
+                        if(info.points[i].scale_changed == convertScales[f]){
+                            info.arrayScale[f].push(info.points[i].addr)
+                        }
+                    }
+                    //重複を削除
+                    info.arrayScale2[f] = Array.from(new Set(info.arrayScale[f]))
+                }
+            //震源に関する情報の場合
+            }else if(info.code == 551 && info.issue.type == "Destination"){
+                //国内での津波の有無を日本語化
+                info.earthquake.domesticTsunami_ja = domesticTsunami[info.earthquake.domesticTsunami]
+            //震源・震度に関する情報の場合
+            }else if (info.code == 551 && info.issue.type == "ScaleAndDestination"){
+                //国内での津波の有無を日本語化
+                info.earthquake.domesticTsunami_ja = domesticTsunami[info.earthquake.domesticTsunami]
+                //最大震度を日本語化
+                info.earthquake.maxScale_ja = quakeScale[info.earthquake.maxScale]
+                //震度情報が含まれている場合
+                if(info.points.length !== 0){
+                    for(let i = 0; i < info.points.length; i++){
+                        //震度を日本語化
+                        info.points[i].scale_changed = quakeScale[info.points[i].scale]
+                        if(info.points[i].isArea == true){
+                            for(let o = 0; o < areaName.length; o++){
+                                //震度観測点の座標を追加
+                                if(areaName[o].area == info.points[i].addr){
+                                    info.points[i].lat = areaName[o].lat
+                                    info.points[i].lon = areaName[o].lon
+                                    break;
+                                }
+                            }
+                        }else if(info.points[i].isArea == false ){
+                            //震度観測点の座標を追加
+                            //市区町村名、都道府県名を追加
+                            for(let o = 0; o < city.length; o++){
+                                if(city[o].name == info.points[i].addr){
+                                    info.points[i].lat = city[o].lat
+                                    info.points[i].lon = city[o].lon
+                                    break;
+                                }
+                                //データがない場合の処理
+                                if(info.points[i].city == undefined){
+                                    info.points[i].city = "データなし"
+                                }
+                                if(info.points[i].pref == undefined){
+                                    info.poinrs[i].pref = "データなし"
+                                }
                             }
                         }
+                    }
+                    //震度ごとに整理
+                    info.arrayScale = {}
+                    info.arrayScale2 = {}
+                    for(let f = 0; f < 11; f++){
+                        info.arrayScale[f] = []
+                        info.arrayScale2[f] = []
+                        //この際は「都道府県名　市区町村名」で保存
+                        for(let i = 0; i < info.points.length; i++){
+                            if(info.points[i].isArea == true){
+                                if(info.points[i].scale_changed == convertScales[f]){
+                                    info.arrayScale[f].push(info.points[i].addr)
+                                }
+                            }else if(info.points[i].isArea == false ){
+                                if(info.points[i].scale_changed == convertScales[f]){
+                                    info.arrayScale[f].push(info.points[i].addr)
+                                }
+                            } 
+                        }
+                        //重複を削除
+                        info.arrayScale2[f] = Array.from(new Set(info.arrayScale[f]))
                     }
                 }
             }
         }
-        console.log(quake)
-        console.log(userQuakeJson)
+    }
+
+    //地震感知情報の処理
+    const get_userQuake = () => {
         for(let i = 0; i < userQuakeJson.length; i++){
             let conf = userQuakeJson[i].confidence
             userQuakeJson[i].confLevel = {}
+            //ObjectをArrayに変換
             userQuakeJson[i].area_conf = Object.entries(userQuakeJson[i].area_confidences)
+            //信頼度を日本語化
             if( conf >= 0 && conf < 0.96774 ){
                 userQuakeJson[i].confLevel = "レベル0"
             }else if( conf >= 0.96774 && conf < 0.97015 ){
@@ -371,6 +195,7 @@
             }else if( conf >= 0.98052 ){
                 userQuakeJson[i].confLevel = "レベル4"
             }
+            //地域名に変換
             for(let e = 0; e < userQuakeJson[i].area_conf.length; e++){
                 let area = userQuakeJson[i].area_conf[e][0]
                 userQuakeJson[i].area_conf[e][2] = {}
@@ -381,19 +206,9 @@
                 }
             }
         }
-        for(let i = 0; i < userQuakeJson.length; i++){
-            if(userQuakeJson[i].confidence !== 0){
-                judgeZero = i
-                break
-            }
-            judgeZero = i
-        }
-        console.log(judgeZero)
     };
 
-
     
-    let judgeZero
     let Rjson;
     let lastQuakeJson;
     let userQuakeJson;
@@ -401,9 +216,11 @@
     let apiHttps;
     let tsunamiJson;
 
+
+    //APIの取得（初期読み込み時）
     try{
         apiHttps = new XMLHttpRequest();
-        apiHttps.open("GET", "https://api.p2pquake.net/v2/history?codes=551&limit=2&offset=2", false);
+        apiHttps.open("GET", "https://api.p2pquake.net/v2/history?codes=551&limit=3", false);
         apiHttps.onreadystatechange = function(){
             if(this.readyState === 4 && this.status === 200){
                 console.log("success")
@@ -415,6 +232,7 @@
         apiHttps.send();
         let log = apiHttps.responseText;
         Rjson = JSON.parse(log);
+        //はじめのレスポンステキストをlastJsonとする
         lastJson = log
 
         const lastQuake = new XMLHttpRequest();
@@ -465,13 +283,20 @@
     //userQuakeJson[0] = sample2
     //tsunamiJson[0] = sample3[0]
     //Rjson[0] = sample4[6]
-    Rjson[0] = prompt[2]
-    getFirst();
+    //Rjson[0] = prompt[2]
+    //Rjson[0] = chiba[3]
+    //Rjson[0] = wakayama[2]
+    //Rjson[0] = foreign[0]
 
+    //処理を実行
+    get();
+    get_userQuake();
+
+    //繰り返し取得（20秒ごと）
     setInterval(function(){
         try{
             apiHttps = new XMLHttpRequest();
-            apiHttps.open("GET", "https://api.p2pquake.net/v2/history?codes=551&limit=2&offset=2", false);
+            apiHttps.open("GET", "https://api.p2pquake.net/v2/history?codes=551&limit=3", false);
             apiHttps.send();
             const log = apiHttps.responseText;
             Rjson = JSON.parse(log);
@@ -497,10 +322,16 @@
         };
         //tsunamiJson[0] = sample3[0]
         //Rjson[0] = sample4[6]
-        Rjson[0] = prompt[2]
+        //Rjson[0] = prompt[2]
+        //Rjson[0] = chiba[3]
+        //Rjson[0] = wakayama[2]
+        //Rjson[0] = foreign[0]
+
+        //処理実行
         get()
     },20000);
 
+    //繰り返し取得（10秒ごと）（地震感知情報）
     setInterval(function(){
         try{
             const userQuake = new XMLHttpRequest();
@@ -512,7 +343,9 @@
             console.log(e)
         };
         //userQuakeJson[0] = sample2
-        get()
+
+        //処理実行
+        get_userQuake()
     },10000);
 
     //時間の取得
@@ -536,30 +369,44 @@
         firstChild.remove()
     })
 
-    const data_for_map = quake[0]
-    const data_for_map2 = quake[1]
+    //マップ用データの定義
+    const data_for_map = Rjson[0]
+    const data_for_map2 = Rjson[1]
 
+    //マップの中心の指定
     const mapOptions = {
-        center: [data_for_map.lat, data_for_map.lon],
+        center: [data_for_map.earthquake.hypocenter.latitude, data_for_map.earthquake.hypocenter.longitude],
         zoom: 9,
     };
+
+    //海外地震情報のマップズーム度指定
+    const options_for_foreign = {
+        center: [data_for_map.earthquake.hypocenter.latitude, data_for_map.earthquake.hypocenter.longitude],
+        zoom: 2,
+    }
+    //マップのタイルレイヤーの指定
     const tileUrl = "https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png";
+
+    //マップの初期の状態の設定
     const tileLayerOptions = {
         minZoom: 0,
         maxZoom: 20,
         maxNativeZoom: 19,
         attribution: `Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`,
     };
+
+    //震源アイコンの設定
     const iconOptions = {
         iconUrl: '/scale/center.png',
         iconSize: [30, 30],
         iconAnchor:[15,15]
     };
 
+    //震度速報時のマップの中心位置を各観測点の座標の平均より算出
     let sumlat = 0;
     let sumlon = 0;
     let noHypocenter;
-    if(data_for_map.type == "ScalePrompt"){
+    if(data_for_map.issue.type == "ScalePrompt"){
         for(let i = 0; i < data_for_map.points.length; i++){
             let replacedLat = data_for_map.points[i].lat
             let replacedLon = data_for_map.points[i].lon
@@ -574,10 +421,7 @@
     }
     
     
-
     let leafletMap;
-    
-    console.log(Number(userQuakeJson[0].updated_at.replace(/\/|:|\s/g,"")))
 
 </script>
 
@@ -627,50 +471,54 @@
             </div>
         </div>
         <div class="recent-quake-right contents-right">
-            {#if (quake[0].type == "DetailScale")}
+            {#if (Rjson[0].issue.type == "DetailScale")}
             {#if (Rjson[0].issue.correct !== "None")}
-            <div class="recent-quake-right-correct">訂正報　{correct[Rjson[0].issue.correct]}に関して</div>
+            <div class="recent-quake-right-correct">訂正報 {correct[Rjson[0].issue.correct]}に関して</div>
             {/if}
-            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{convertColor[Rjson[0].earthquake.maxScale][0]}; color:{convertColor[Rjson[0].earthquake.maxScale][1]};">{quake[0].maxScale}</div>
+            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{change_color_intensity[Rjson[0].earthquake.maxScale][0]}; color:{change_color_intensity[Rjson[0].earthquake.maxScale][1]};">{Rjson[0].earthquake.maxScale_ja}</div>
             <div class="recent-quake-right-info recent-quake-right-contents">
                 <div class="recent-quake-right-info-time recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-time-title-ja recent-quake-right-info-contents-title-ja">時刻</div>
                     <div class="recent-quake-right-info-time-title-en recent-quake-right-info-contents-title-en">time</div>
-                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{quake[0].time}</div>
+                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{Rjson[0].earthquake.time}</div>
                 </div>
                 <div class="recent-quake-right-info-intensity recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-intensity-title-ja recent-quake-right-info-contents-title-ja">最大震度</div>
                     <div class="recent-quake-right-info-intensity-title-en recent-quake-right-info-contents-title-en">max intensity</div>
-                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{quake[0].maxScale}</div>
+                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{Rjson[0].earthquake.maxScale_ja}</div>
                 </div>
                 <div class="recent-quake-right-info-magunitude recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-magunitude-title-ja recent-quake-right-info-contents-title-ja">マグニチュード</div>
                     <div class="recent-quake-right-info-magunitude-title-en recent-quake-right-info-contents-title-en">magunitude</div>
-                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{quake[0].magnitude}</div>
+                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{Rjson[0].earthquake.hypocenter.magnitude}</div>
                 </div>
                 <div class="recent-quake-right-info-hypocenter recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-hypocenter-title-ja recent-quake-right-info-contents-title-ja">震源</div>
                     <div class="recent-quake-right-info-hypocenter-title-en recent-quake-right-info-contents-title-en">hypocenter</div>
-                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">{quake[0].location}</div>
+                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">{Rjson[0].earthquake.hypocenter.name}</div>
                 </div>
                 <div class="recent-quake-right-info-depth recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-depth-title-ja recent-quake-right-info-contents-title-ja">深さ</div>
                     <div class="recent-quake-right-info-depth-title-en recent-quake-right-info-contents-title-en">depth of the hypocenter</div>
-                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">約{quake[0].depth}km</div>
+                    {#if Rjson[0].earthquake.hypocenter.depth !== 0}
+                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">約{Rjson[0].earthquake.hypocenter.depth}km</div>
+                    {:else}
+                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">ごく浅い</div>
+                    {/if}
                 </div>
                 <div class="recent-quake-right-info-tsunami recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-tsunami-title-ja recent-quake-right-info-contents-title-ja">津波</div>
                     <div class="recent-quake-right-info-tsunami-title-en recent-quake-right-info-contents-title-en">possibility of tsunami</div>
-                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{quake[0].domesticTsunami}</div>
+                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{Rjson[0].earthquake.domesticTsunami_ja}</div>
                 </div>
                 <div class="recent-quake-right-info-area recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-area-title-ja recent-quake-right-info-contents-title-ja">各地の震度</div>
                     <div class="recent-quake-right-info-area-title-en recent-quake-right-info-contents-title-en">intensity in each area</div>
                     <div class="recent-quake-right-info-area-area recent-quake-right-info-contents-content">
                         {#each changeArray as change}
-                        {#if quake[0].arrayScale2[change].length > 0}
-                        <div class="recent-quake-right-info-area-area-intencity" style="border-bottom:2px solid {convertColor[change][0]};">{convertScales[change]}</div>
-                        {#each quake[0].arrayScale2[change] as location}
+                        {#if Rjson[0].arrayScale2[change].length > 0}
+                        <div class="recent-quake-right-info-area-area-intencity" style="border-bottom:2px solid {convertColor[change][0]};">震度{convertScales[change]}</div>
+                        {#each Rjson[0].arrayScale2[change] as location}
                         <div class="recent-quake-right-info-area-area-name">{location}</div>
                         {/each}
                         {/if}
@@ -678,63 +526,76 @@
                     </div>
                 </div>
             </div>
-            {:else if (quake[0].type == "Destination")}
+            {:else if (Rjson[0].issue.type == "Destination")}
             {#if (Rjson[0].issue.correct !== "None")}
-            <div class="recent-quake-right-correct">訂正報　{correct[Rjson[0].issue.correct]}に関して</div>
+            <div class="recent-quake-right-correct">訂正報 {correct[Rjson[0].issue.correct]}に関して</div>
             {/if}
-            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{convertColor[Rjson[1].earthquake.maxScale][0]}; color:{convertColor[Rjson[1].earthquake.maxScale][1]};">{quake[1].maxScale}</div>
+            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{change_color_intensity[Rjson[1].earthquake.maxScale][0]}; color:{change_color_intensity[Rjson[1].earthquake.maxScale][1]};">{Rjson[1].earthquake.maxScale_ja}</div>
             <div class="recent-quake-right-info recent-quake-right-contents">
                 <div class="recent-quake-right-info-time recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-time-title-ja recent-quake-right-info-contents-title-ja">時刻</div>
                     <div class="recent-quake-right-info-time-title-en recent-quake-right-info-contents-title-en">time</div>
-                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{quake[0].time}</div>
+                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{Rjson[0].earthquake.time}</div>
                 </div>
                 <div class="recent-quake-right-info-intensity recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-intensity-title-ja recent-quake-right-info-contents-title-ja">最大震度</div>
                     <div class="recent-quake-right-info-intensity-title-en recent-quake-right-info-contents-title-en">max intensity</div>
-                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{quake[1].maxScale}</div>
+                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{Rjson[1].earthquake.maxScale_ja}</div>
                 </div>
                 <div class="recent-quake-right-info-magunitude recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-magunitude-title-ja recent-quake-right-info-contents-title-ja">マグニチュード</div>
                     <div class="recent-quake-right-info-magunitude-title-en recent-quake-right-info-contents-title-en">magunitude</div>
-                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{quake[0].magnitude}</div>
+                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{Rjson[0].earthquake.hypocenter.magnitude}</div>
                 </div>
                 <div class="recent-quake-right-info-hypocenter recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-hypocenter-title-ja recent-quake-right-info-contents-title-ja">震源</div>
                     <div class="recent-quake-right-info-hypocenter-title-en recent-quake-right-info-contents-title-en">hypocenter</div>
-                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">{quake[0].name}</div>
+                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">{Rjson[0].earthquake.hypocenter.name}</div>
                 </div>
                 <div class="recent-quake-right-info-depth recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-depth-title-ja recent-quake-right-info-contents-title-ja">深さ</div>
                     <div class="recent-quake-right-info-depth-title-en recent-quake-right-info-contents-title-en">depth of the hypocenter</div>
-                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">約{quake[0].depth}km</div>
+                    {#if Rjson[0].earthquake.hypocenter.depth !== 0}
+                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">約{Rjson[0].earthquake.hypocenter.depth}km</div>
+                    {:else}
+                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">ごく浅い</div>
+                    {/if}
                 </div>
                 <div class="recent-quake-right-info-tsunami recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-tsunami-title-ja recent-quake-right-info-contents-title-ja">津波</div>
                     <div class="recent-quake-right-info-tsunami-title-en recent-quake-right-info-contents-title-en">possibility of tsunami</div>
-                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{quake[0].domesticTsunami}</div>
+                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{Rjson[0].earthquake.domesticTsunami_ja}</div>
                 </div>
                 <div class="recent-quake-right-info-area recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-area-title-ja recent-quake-right-info-contents-title-ja">各地の震度</div>
                     <div class="recent-quake-right-info-area-title-en recent-quake-right-info-contents-title-en">intensity in each area</div>
-                    <div class="recent-quake-right-info-area-area recent-quake-right-info-contents-content">調査中</div>
+                    <div class="recent-quake-right-info-area-area recent-quake-right-info-contents-content">
+                        {#each changeArray as change}
+                        {#if Rjson[1].arrayScale2[change].length > 0}
+                        <div class="recent-quake-right-info-area-area-intencity" style="border-bottom:2px solid {convertColor[change][0]};">震度{convertScales[change]}</div>
+                        {#each Rjson[1].arrayScale2[change] as location}
+                        <div class="recent-quake-right-info-area-area-name">{location}</div>
+                        {/each}
+                        {/if}
+                        {/each}
+                    </div>
                 </div>
             </div>
-            {:else if (quake[0].type == "ScalePrompt")}
+            {:else if (Rjson[0].issue.type == "ScalePrompt")}
             {#if (Rjson[0].issue.correct !== "None")}
-            <div class="recent-quake-right-correct">訂正報　{correct[Rjson[0].issue.correct]}に関して</div>
+            <div class="recent-quake-right-correct">訂正報 {correct[Rjson[0].issue.correct]}に関して</div>
             {/if}
-            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{convertColor[Rjson[0].earthquake.maxScale][0]}; color:{convertColor[Rjson[0].earthquake.maxScale][1]};">{quake[0].maxScale}</div>
+            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{change_color_intensity[Rjson[0].earthquake.maxScale][0]}; color:{change_color_intensity[Rjson[0].earthquake.maxScale][1]};">{Rjson[0].earthquake.maxScale_ja}</div>
             <div class="recent-quake-right-info recent-quake-right-contents">
                 <div class="recent-quake-right-info-time recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-time-title-ja recent-quake-right-info-contents-title-ja">時刻</div>
                     <div class="recent-quake-right-info-time-title-en recent-quake-right-info-contents-title-en">time</div>
-                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{quake[0].time}</div>
+                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{Rjson[0].earthquake.time}</div>
                 </div>
                 <div class="recent-quake-right-info-intensity recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-intensity-title-ja recent-quake-right-info-contents-title-ja">最大震度</div>
                     <div class="recent-quake-right-info-intensity-title-en recent-quake-right-info-contents-title-en">max intensity</div>
-                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{quake[0].maxScale}</div>
+                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{Rjson[0].earthquake.maxScale_ja}</div>
                 </div>
                 <div class="recent-quake-right-info-magunitude recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-magunitude-title-ja recent-quake-right-info-contents-title-ja">マグニチュード</div>
@@ -759,7 +620,113 @@
                 <div class="recent-quake-right-info-area recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-area-title-ja recent-quake-right-info-contents-title-ja">各地の震度</div>
                     <div class="recent-quake-right-info-area-title-en recent-quake-right-info-contents-title-en">intensity in each area</div>
-                    <div class="recent-quake-right-info-area-area recent-quake-right-info-contents-content">調査中</div>
+                    <div class="recent-quake-right-info-area-area recent-quake-right-info-contents-content">
+                        {#each changeArray as change}
+                        {#if Rjson[0].arrayScale2[change].length > 0}
+                        <div class="recent-quake-right-info-area-area-intencity" style="border-bottom:2px solid {convertColor[change][0]};">震度{convertScales[change]}</div>
+                        {#each Rjson[0].arrayScale2[change] as location}
+                        <div class="recent-quake-right-info-area-area-name">{location}</div>
+                        {/each}
+                        {/if}
+                        {/each}
+                    </div>
+                </div>
+            </div>
+            {:else if (Rjson[0].issue.type == "ScaleAndDestination")}
+            {#if (Rjson[0].issue.correct !== "None")}
+            <div class="recent-quake-right-correct">訂正報 {correct[Rjson[0].issue.correct]}に関して</div>
+            {/if}
+            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{change_color_intensity[Rjson[0].earthquake.maxScale][0]}; color:{change_color_intensity[Rjson[0].earthquake.maxScale][1]};">{Rjson[0].earthquake.maxScale_ja}</div>
+            <div class="recent-quake-right-info recent-quake-right-contents">
+                <div class="recent-quake-right-info-time recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-time-title-ja recent-quake-right-info-contents-title-ja">時刻</div>
+                    <div class="recent-quake-right-info-time-title-en recent-quake-right-info-contents-title-en">time</div>
+                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{Rjson[0].earthquake.time}</div>
+                </div>
+                <div class="recent-quake-right-info-intensity recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-intensity-title-ja recent-quake-right-info-contents-title-ja">最大震度</div>
+                    <div class="recent-quake-right-info-intensity-title-en recent-quake-right-info-contents-title-en">max intensity</div>
+                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{Rjson[0].earthquake.maxScale_ja}</div>
+                </div>
+                <div class="recent-quake-right-info-magunitude recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-magunitude-title-ja recent-quake-right-info-contents-title-ja">マグニチュード</div>
+                    <div class="recent-quake-right-info-magunitude-title-en recent-quake-right-info-contents-title-en">magunitude</div>
+                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{Rjson[0].earthquake.hypocenter.magnitude}</div>
+                </div>
+                <div class="recent-quake-right-info-hypocenter recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-hypocenter-title-ja recent-quake-right-info-contents-title-ja">震源</div>
+                    <div class="recent-quake-right-info-hypocenter-title-en recent-quake-right-info-contents-title-en">hypocenter</div>
+                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">{Rjson[0].earthquake.hypocenter.name}</div>
+                </div>
+                <div class="recent-quake-right-info-depth recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-depth-title-ja recent-quake-right-info-contents-title-ja">深さ</div>
+                    <div class="recent-quake-right-info-depth-title-en recent-quake-right-info-contents-title-en">depth of the hypocenter</div>
+                    {#if Rjson[0].earthquake.hypocenter.depth !== 0}
+                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">約{Rjson[0].earthquake.hypocenter.depth}km</div>
+                    {:else}
+                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">ごく浅い</div>
+                    {/if}
+                </div>
+                <div class="recent-quake-right-info-tsunami recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-tsunami-title-ja recent-quake-right-info-contents-title-ja">津波</div>
+                    <div class="recent-quake-right-info-tsunami-title-en recent-quake-right-info-contents-title-en">possibility of tsunami</div>
+                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{Rjson[0].earthquake.domesticTsunami_ja}</div>
+                </div>
+                <div class="recent-quake-right-info-area recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-area-title-ja recent-quake-right-info-contents-title-ja">各地の震度</div>
+                    <div class="recent-quake-right-info-area-title-en recent-quake-right-info-contents-title-en">intensity in each area</div>
+                    <div class="recent-quake-right-info-area-area recent-quake-right-info-contents-content">
+                        {#each changeArray as change}
+                        {#if Rjson[0].arrayScale2[change].length > 0}
+                        <div class="recent-quake-right-info-area-area-intencity" style="border-bottom:2px solid {convertColor[change][0]};">震度{convertScales[change]}</div>
+                        {#each Rjson[0].arrayScale2[change] as location}
+                        <div class="recent-quake-right-info-area-area-name">{location}</div>
+                        {/each}
+                        {/if}
+                        {/each}
+                    </div>
+                </div>
+            </div>
+            {:else if (Rjson[0].issue.type == "Foreign")}
+            {#if (Rjson[0].issue.correct !== "None")}
+            <div class="recent-quake-right-correct">訂正報 {correct[Rjson[0].issue.correct]}に関して</div>
+            {/if}
+            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="font-size:26px;margin-top:5px;">海外地震情報</div>
+            <div class="recent-quake-right-info recent-quake-right-contents">
+                <div class="recent-quake-right-info-time recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-time-title-ja recent-quake-right-info-contents-title-ja">時刻</div>
+                    <div class="recent-quake-right-info-time-title-en recent-quake-right-info-contents-title-en">time</div>
+                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{Rjson[0].earthquake.time}</div>
+                </div>
+                <div class="recent-quake-right-info-intensity recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-intensity-title-ja recent-quake-right-info-contents-title-ja">最大震度</div>
+                    <div class="recent-quake-right-info-intensity-title-en recent-quake-right-info-contents-title-en">max intensity</div>
+                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">不明</div>
+                </div>
+                <div class="recent-quake-right-info-magunitude recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-magunitude-title-ja recent-quake-right-info-contents-title-ja">マグニチュード</div>
+                    <div class="recent-quake-right-info-magunitude-title-en recent-quake-right-info-contents-title-en">magunitude</div>
+                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{Rjson[0].earthquake.hypocenter.magnitude}</div>
+                </div>
+                <div class="recent-quake-right-info-hypocenter recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-hypocenter-title-ja recent-quake-right-info-contents-title-ja">震源</div>
+                    <div class="recent-quake-right-info-hypocenter-title-en recent-quake-right-info-contents-title-en">hypocenter</div>
+                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">{Rjson[0].earthquake.hypocenter.name}</div>
+                </div>
+                <div class="recent-quake-right-info-depth recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-depth-title-ja recent-quake-right-info-contents-title-ja">深さ</div>
+                    <div class="recent-quake-right-info-depth-title-en recent-quake-right-info-contents-title-en">depth of the hypocenter</div>
+                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">不明</div>
+                </div>
+                <div class="recent-quake-right-info-tsunami recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-tsunami-title-ja recent-quake-right-info-contents-title-ja">津波</div>
+                    <div class="recent-quake-right-info-tsunami-title-en recent-quake-right-info-contents-title-en">possibility of tsunami</div>
+                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{domesticTsunami[Rjson[0].earthquake.domesticTsunami]}</div>
+                </div>
+                <div class="recent-quake-right-info-area recent-quake-right-info-contents">
+                    <div class="recent-quake-right-info-area-title-ja recent-quake-right-info-contents-title-ja">各地の震度</div>
+                    <div class="recent-quake-right-info-area-title-en recent-quake-right-info-contents-title-en">intensity in each area</div>
+                    <div class="recent-quake-right-info-area-area recent-quake-right-info-contents-content">不明</div>
                 </div>
             </div>
             {/if}
@@ -774,13 +741,13 @@
         </div>
         <div class="distribution-right contents-right">
             <div class="distribution-right-map">
-                {#if data_for_map.type == "DetailScale"}
+                {#if data_for_map.issue.type == "DetailScale"}
                 <LeafletMap bind:this={leafletMap} options={mapOptions}>
                     <TileLayer url={tileUrl} options={tileLayerOptions}/>
                     {#each data_for_map.points as point}
                         {#each scales_for_map as scales}
                             {#if point.scale == scales[0]}
-                            {#if point.lat !== null || point.lon !== null}
+                            {#if "lat" in point && "lon" in point}
                                 <Marker latLng={[point.lat, point.lon]} zIndexOffset={scales[2]}>
                                     <Icon options={scales[1]}/>
                                 </Marker>
@@ -788,19 +755,19 @@
                             {/if}
                         {/each}
                     {/each}
-                    {#if data_for_map.lat !== null || data_for_map.lon !== null}
-                        <Marker latLng={[data_for_map.lat, data_for_map.lon]} zIndexOffset={5000}>
+                    {#if "latitude" in data_for_map.earthquake.hypocenter && "longitude" in data_for_map.earthquake.hypocenter}
+                        <Marker latLng={[data_for_map.earthquake.hypocenter.latitude, data_for_map.earthquake.hypocenter.longitude]} zIndexOffset={5000}>
                             <Icon options={iconOptions}/>
                         </Marker>
                     {/if}
                 </LeafletMap>
-                {:else if data_for_map.type == "Destination"}
+                {:else if data_for_map.issue.type == "Destination"}
                 <LeafletMap bind:this={leafletMap} options={mapOptions}>
                     <TileLayer url={tileUrl} options={tileLayerOptions}/>
                     {#each data_for_map2.points as point}
                         {#each scales_for_map as scales}
                             {#if point.scale == scales[0]}
-                            {#if point.lat !== null || point.lon !== null}
+                            {#if "lat" in point && "lon" in point}
                                 <Marker latLng={[point.lat, point.lon]} zIndexOffset={scales[2]}>
                                     <Icon options={scales[1]}/>
                                 </Marker>
@@ -808,19 +775,19 @@
                             {/if}
                         {/each}
                     {/each}
-                    {#if data_for_map.lat !== null || data_for_map.lon !== null}
-                        <Marker latLng={[data_for_map.lat, data_for_map.lon]} zIndexOffset={5000}>
-                            <Icon options={iconOptions}/>
-                        </Marker>
+                    {#if "latitude" in data_for_map.earthquake.hypocenter && "longitude" in data_for_map.earthquake.hypocenter}
+                    <Marker latLng={[data_for_map.earthquake.hypocenter.latitude, data_for_map.earthquake.hypocenter.longitude]} zIndexOffset={5000}>
+                        <Icon options={iconOptions}/>
+                    </Marker>
                     {/if}
                 </LeafletMap>
-                {:else if data_for_map.type == "ScalePrompt"}
+                {:else if data_for_map.issue.type == "ScalePrompt"}
                 <LeafletMap bind:this={leafletMap} options={noHypocenter}>
                     <TileLayer url={tileUrl} options={tileLayerOptions}/>
                     {#each data_for_map.points as point}
                         {#each scales_for_map as scales}
                             {#if point.scale == scales[0]}
-                            {#if point.lat !== null || point.lon !== null}
+                            {#if "lat" in point && "lon" in point}
                                 <Marker latLng={[point.lat, point.lon]} zIndexOffset={scales[2]}>
                                     <Icon options={scales[1]}/>
                                 </Marker>
@@ -829,6 +796,55 @@
                         {/each}
                     {/each}
                 </LeafletMap>
+                {:else if data_for_map.issue.type == "ScaleAndDestination"}
+                    {#if data_for_map.points.length !== 0}
+                    <LeafletMap bind:this={leafletMap} options={mapOptions}>
+                        <TileLayer url={tileUrl} options={tileLayerOptions}/>
+                        {#each data_for_map.points as point}
+                            {#each scales_for_map as scales}
+                                {#if point.scale == scales[0]}
+                                {#if "lat" in point && "lon" in point}
+                                    <Marker latLng={[point.lat, point.lon]} zIndexOffset={scales[2]}>
+                                        <Icon options={scales[1]}/>
+                                    </Marker>
+                                {/if}
+                                {/if}
+                            {/each}
+                        {/each}
+                        {#if "latitude" in data_for_map.earthquake.hypocenter && "longitude" in data_for_map.earthquake.hypocenter}
+                        <Marker latLng={[data_for_map.earthquake.hypocenter.latitude, data_for_map.earthquake.hypocenter.longitude]} zIndexOffset={5000}>
+                            <Icon options={iconOptions}/>
+                        </Marker>
+                        {/if}
+                    </LeafletMap>
+                    {:else}
+                    <LeafletMap bind:this={leafletMap} options={mapOptions}>
+                        <TileLayer url={tileUrl} options={tileLayerOptions}/>
+                        {#each data_for_map2.points as point}
+                            {#each scales_for_map as scales}
+                                {#if point.scale == scales[0]}
+                                {#if "lat" in point && "lon" in point}
+                                    <Marker latLng={[point.lat, point.lon]} zIndexOffset={scales[2]}>
+                                        <Icon options={scales[1]}/>
+                                    </Marker>
+                                {/if}
+                                {/if}
+                            {/each}
+                        {/each}
+                        {#if "latitude" in data_for_map.earthquake.hypocenter && "longitude" in data_for_map.earthquake.hypocenter}
+                        <Marker latLng={[data_for_map.earthquake.hypocenter.latitude, data_for_map.earthquake.hypocenter.longitude]} zIndexOffset={5000}>
+                            <Icon options={iconOptions}/>
+                        </Marker>
+                        {/if}
+                    </LeafletMap>
+                    {/if}
+                {:else if data_for_map.issue.type == "Foreign"}
+                    <LeafletMap bind:this={leafletMap} options={options_for_foreign}>
+                        <TileLayer url={tileUrl} options={tileLayerOptions}/>
+                            <Marker latLng={[data_for_map.earthquake.hypocenter.latitude, data_for_map.earthquake.hypocenter.longitude]} zIndexOffset={5000}>
+                                <Icon options={iconOptions}/>
+                            </Marker>
+                    </LeafletMap>
                 {/if}
             </div>
         </div>
@@ -851,7 +867,7 @@
                     <div class="past-quake-right-each-info2-magunitude"><span style="font-size:20px;">M</span>{recentQuake.earthquake.hypocenter.magnitude}</div>
                 </div>
                 <div class="past-quake-right-each-info3">
-                    <div class="past-quake-right-each-info3-inner" style="background-color:{convertColor[recentQuake.earthquake.maxScale][0]}; color:{convertColor[recentQuake.earthquake.maxScale][1]};">{quakeScale[recentQuake.earthquake.maxScale]}</div>
+                    <div class="past-quake-right-each-info3-inner" style="background-color:{change_color_intensity[recentQuake.earthquake.maxScale][0]}; color:{change_color_intensity[recentQuake.earthquake.maxScale][1]};">{quakeScale[recentQuake.earthquake.maxScale]}</div>
                 </div>                
             </div>
             {/each}
