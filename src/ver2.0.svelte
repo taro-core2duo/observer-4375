@@ -1023,6 +1023,7 @@
     }
     .github-link{
         text-decoration: none;
+        color:#000000
     }
     .github-link:visited{
         color:#000000;
