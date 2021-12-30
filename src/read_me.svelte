@@ -27,7 +27,7 @@
 
 <div class="parent">
     <div class="child" use:clickOutside on:click_outside={close_read_me}>
-        <embed src="observer_4375.pdf" type="application/pdf" width="90%" height="90%" class="pdf">
+        <iframe title="explanation" src="https://store-pdf.vercel.app/pdfjs/web/viewer.html?file=observer_4375.pdf" type="application/pdf" width="100%" height="100%" class="pdf">
     </div>
 </div>
 
