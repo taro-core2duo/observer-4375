@@ -1,4 +1,6 @@
 <script>
+    import Read_me from './read_me.svelte'
+    import { read_me ,y } from "./stores"
     import { pointData } from "./points.js"
     import { quakeScale } from "./quakeScale"
     import { areaName } from "./areaName"
@@ -18,6 +20,7 @@
     import { chiba } from "./chiba"
     import { foreign } from "./foreign"
     import { wakayama } from "./wakayama"
+    import { other } from "./other"
     import { scales_for_map } from "./scales-for-map"
     import { correct } from "./correct"
     import {LeafletMap, Icon, Marker, TileLayer} from 'svelte-leafletjs';
@@ -287,6 +290,7 @@
     //Rjson[0] = chiba[3]
     //Rjson[0] = wakayama[2]
     //Rjson[0] = foreign[0]
+    //Rjson = other
 
     //処理を実行
     get();
@@ -326,6 +330,7 @@
         //Rjson[0] = chiba[3]
         //Rjson[0] = wakayama[2]
         //Rjson[0] = foreign[0]
+        //Rjson = other
 
         //処理実行
         get()
@@ -369,9 +374,16 @@
         firstChild.remove()
     })
 
+    let r;
+    if(Rjson[0].issue.type !== "Other"){
+        r = 0
+    }else{
+        r = 1
+    } 
+    
     //マップ用データの定義
-    const data_for_map = Rjson[0]
-    const data_for_map2 = Rjson[1]
+    const data_for_map = Rjson[r]
+    const data_for_map2 = Rjson[r+1]
 
     //マップの中心の指定
     const mapOptions = {
@@ -423,16 +435,30 @@
     
     let leafletMap;
 
+    let y_number;
+    const open_read_me = () => {
+        y_number = "-" + window.scrollY + "px"
+        y.set(y_number)
+        console.log(y_number)
+        read_me.set(true)
+    }
 </script>
 
-<div class="parent">
+<div class="parent" class:modal-open={$read_me} id="scroll" style="--y_value:{y_number};">
     <div class="logo contents">
         <div class="logo-inner">observer<br>4375</div>
+        <div style="width:40px; height:100%;"></div>
         <div class="github">
             <a href="https://github.com/taro-core2duo/observer-4375">
                 <img src="GitHub-Mark-64px.png" alt="github" class="github-img">
+            </a>
+            <a href="https://github.com/taro-core2duo/observer-4375">
                 <p class="github-text">github</p>
             </a>
+        </div>
+        <div class="read" on:click={open_read_me}>
+            <i class="fas fa-book-open fa-2x fa-fw read-icon" ></i>
+            <p class="read-text">read me</p>
         </div>
     </div>
     <div class="EEW-detection contents">
@@ -471,37 +497,37 @@
             </div>
         </div>
         <div class="recent-quake-right contents-right">
-            {#if (Rjson[0].issue.type == "DetailScale")}
-            {#if (Rjson[0].issue.correct !== "None")}
-            <div class="recent-quake-right-correct">訂正報 {correct[Rjson[0].issue.correct]}に関して</div>
+            {#if (Rjson[r].issue.type == "DetailScale")}
+            {#if (Rjson[r].issue.correct !== "None")}
+            <div class="recent-quake-right-correct">訂正報 {correct[Rjson[r].issue.correct]}に関して</div>
             {/if}
-            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{change_color_intensity[Rjson[0].earthquake.maxScale][0]}; color:{change_color_intensity[Rjson[0].earthquake.maxScale][1]};">{Rjson[0].earthquake.maxScale_ja}</div>
+            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{change_color_intensity[Rjson[r].earthquake.maxScale][0]}; color:{change_color_intensity[Rjson[r].earthquake.maxScale][1]};">{Rjson[r].earthquake.maxScale_ja}</div>
             <div class="recent-quake-right-info recent-quake-right-contents">
                 <div class="recent-quake-right-info-time recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-time-title-ja recent-quake-right-info-contents-title-ja">時刻</div>
                     <div class="recent-quake-right-info-time-title-en recent-quake-right-info-contents-title-en">time</div>
-                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{Rjson[0].earthquake.time}</div>
+                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{Rjson[r].earthquake.time}</div>
                 </div>
                 <div class="recent-quake-right-info-intensity recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-intensity-title-ja recent-quake-right-info-contents-title-ja">最大震度</div>
                     <div class="recent-quake-right-info-intensity-title-en recent-quake-right-info-contents-title-en">max intensity</div>
-                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{Rjson[0].earthquake.maxScale_ja}</div>
+                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{Rjson[r].earthquake.maxScale_ja}</div>
                 </div>
                 <div class="recent-quake-right-info-magunitude recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-magunitude-title-ja recent-quake-right-info-contents-title-ja">マグニチュード</div>
                     <div class="recent-quake-right-info-magunitude-title-en recent-quake-right-info-contents-title-en">magunitude</div>
-                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{Rjson[0].earthquake.hypocenter.magnitude}</div>
+                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{Rjson[r].earthquake.hypocenter.magnitude}</div>
                 </div>
                 <div class="recent-quake-right-info-hypocenter recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-hypocenter-title-ja recent-quake-right-info-contents-title-ja">震源</div>
                     <div class="recent-quake-right-info-hypocenter-title-en recent-quake-right-info-contents-title-en">hypocenter</div>
-                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">{Rjson[0].earthquake.hypocenter.name}</div>
+                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">{Rjson[r].earthquake.hypocenter.name}</div>
                 </div>
                 <div class="recent-quake-right-info-depth recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-depth-title-ja recent-quake-right-info-contents-title-ja">深さ</div>
                     <div class="recent-quake-right-info-depth-title-en recent-quake-right-info-contents-title-en">depth of the hypocenter</div>
-                    {#if Rjson[0].earthquake.hypocenter.depth !== 0}
-                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">約{Rjson[0].earthquake.hypocenter.depth}km</div>
+                    {#if Rjson[r].earthquake.hypocenter.depth !== 0}
+                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">約{Rjson[r].earthquake.hypocenter.depth}km</div>
                     {:else}
                     <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">ごく浅い</div>
                     {/if}
@@ -509,16 +535,16 @@
                 <div class="recent-quake-right-info-tsunami recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-tsunami-title-ja recent-quake-right-info-contents-title-ja">津波</div>
                     <div class="recent-quake-right-info-tsunami-title-en recent-quake-right-info-contents-title-en">possibility of tsunami</div>
-                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{Rjson[0].earthquake.domesticTsunami_ja}</div>
+                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{Rjson[r].earthquake.domesticTsunami_ja}</div>
                 </div>
                 <div class="recent-quake-right-info-area recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-area-title-ja recent-quake-right-info-contents-title-ja">各地の震度</div>
                     <div class="recent-quake-right-info-area-title-en recent-quake-right-info-contents-title-en">intensity in each area</div>
                     <div class="recent-quake-right-info-area-area recent-quake-right-info-contents-content">
                         {#each changeArray as change}
-                        {#if Rjson[0].arrayScale2[change].length > 0}
+                        {#if Rjson[r].arrayScale2[change].length > 0}
                         <div class="recent-quake-right-info-area-area-intencity" style="border-bottom:2px solid {convertColor[change][0]};">震度{convertScales[change]}</div>
-                        {#each Rjson[0].arrayScale2[change] as location}
+                        {#each Rjson[r].arrayScale2[change] as location}
                         <div class="recent-quake-right-info-area-area-name">{location}</div>
                         {/each}
                         {/if}
@@ -526,37 +552,37 @@
                     </div>
                 </div>
             </div>
-            {:else if (Rjson[0].issue.type == "Destination")}
-            {#if (Rjson[0].issue.correct !== "None")}
-            <div class="recent-quake-right-correct">訂正報 {correct[Rjson[0].issue.correct]}に関して</div>
+            {:else if (Rjson[r].issue.type == "Destination")}
+            {#if (Rjson[r].issue.correct !== "None")}
+            <div class="recent-quake-right-correct">訂正報 {correct[Rjson[r].issue.correct]}に関して</div>
             {/if}
-            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{change_color_intensity[Rjson[1].earthquake.maxScale][0]}; color:{change_color_intensity[Rjson[1].earthquake.maxScale][1]};">{Rjson[1].earthquake.maxScale_ja}</div>
+            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{change_color_intensity[Rjson[r+1].earthquake.maxScale][0]}; color:{change_color_intensity[Rjson[r+1].earthquake.maxScale][1]};">{Rjson[r+1].earthquake.maxScale_ja}</div>
             <div class="recent-quake-right-info recent-quake-right-contents">
                 <div class="recent-quake-right-info-time recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-time-title-ja recent-quake-right-info-contents-title-ja">時刻</div>
                     <div class="recent-quake-right-info-time-title-en recent-quake-right-info-contents-title-en">time</div>
-                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{Rjson[0].earthquake.time}</div>
+                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{Rjson[r].earthquake.time}</div>
                 </div>
                 <div class="recent-quake-right-info-intensity recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-intensity-title-ja recent-quake-right-info-contents-title-ja">最大震度</div>
                     <div class="recent-quake-right-info-intensity-title-en recent-quake-right-info-contents-title-en">max intensity</div>
-                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{Rjson[1].earthquake.maxScale_ja}</div>
+                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{Rjson[r+1].earthquake.maxScale_ja}</div>
                 </div>
                 <div class="recent-quake-right-info-magunitude recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-magunitude-title-ja recent-quake-right-info-contents-title-ja">マグニチュード</div>
                     <div class="recent-quake-right-info-magunitude-title-en recent-quake-right-info-contents-title-en">magunitude</div>
-                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{Rjson[0].earthquake.hypocenter.magnitude}</div>
+                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{Rjson[r].earthquake.hypocenter.magnitude}</div>
                 </div>
                 <div class="recent-quake-right-info-hypocenter recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-hypocenter-title-ja recent-quake-right-info-contents-title-ja">震源</div>
                     <div class="recent-quake-right-info-hypocenter-title-en recent-quake-right-info-contents-title-en">hypocenter</div>
-                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">{Rjson[0].earthquake.hypocenter.name}</div>
+                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">{Rjson[r].earthquake.hypocenter.name}</div>
                 </div>
                 <div class="recent-quake-right-info-depth recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-depth-title-ja recent-quake-right-info-contents-title-ja">深さ</div>
                     <div class="recent-quake-right-info-depth-title-en recent-quake-right-info-contents-title-en">depth of the hypocenter</div>
-                    {#if Rjson[0].earthquake.hypocenter.depth !== 0}
-                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">約{Rjson[0].earthquake.hypocenter.depth}km</div>
+                    {#if Rjson[r].earthquake.hypocenter.depth !== 0}
+                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">約{Rjson[r].earthquake.hypocenter.depth}km</div>
                     {:else}
                     <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">ごく浅い</div>
                     {/if}
@@ -564,16 +590,16 @@
                 <div class="recent-quake-right-info-tsunami recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-tsunami-title-ja recent-quake-right-info-contents-title-ja">津波</div>
                     <div class="recent-quake-right-info-tsunami-title-en recent-quake-right-info-contents-title-en">possibility of tsunami</div>
-                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{Rjson[0].earthquake.domesticTsunami_ja}</div>
+                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{Rjson[r].earthquake.domesticTsunami_ja}</div>
                 </div>
                 <div class="recent-quake-right-info-area recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-area-title-ja recent-quake-right-info-contents-title-ja">各地の震度</div>
                     <div class="recent-quake-right-info-area-title-en recent-quake-right-info-contents-title-en">intensity in each area</div>
                     <div class="recent-quake-right-info-area-area recent-quake-right-info-contents-content">
                         {#each changeArray as change}
-                        {#if Rjson[1].arrayScale2[change].length > 0}
+                        {#if Rjson[r+1].arrayScale2[change].length > 0}
                         <div class="recent-quake-right-info-area-area-intencity" style="border-bottom:2px solid {convertColor[change][0]};">震度{convertScales[change]}</div>
-                        {#each Rjson[1].arrayScale2[change] as location}
+                        {#each Rjson[r+1].arrayScale2[change] as location}
                         <div class="recent-quake-right-info-area-area-name">{location}</div>
                         {/each}
                         {/if}
@@ -581,21 +607,21 @@
                     </div>
                 </div>
             </div>
-            {:else if (Rjson[0].issue.type == "ScalePrompt")}
-            {#if (Rjson[0].issue.correct !== "None")}
-            <div class="recent-quake-right-correct">訂正報 {correct[Rjson[0].issue.correct]}に関して</div>
+            {:else if (Rjson[r].issue.type == "ScalePrompt")}
+            {#if (Rjson[r].issue.correct !== "None")}
+            <div class="recent-quake-right-correct">訂正報 {correct[Rjson[r].issue.correct]}に関して</div>
             {/if}
-            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{change_color_intensity[Rjson[0].earthquake.maxScale][0]}; color:{change_color_intensity[Rjson[0].earthquake.maxScale][1]};">{Rjson[0].earthquake.maxScale_ja}</div>
+            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{change_color_intensity[Rjson[r].earthquake.maxScale][0]}; color:{change_color_intensity[Rjson[r].earthquake.maxScale][1]};">{Rjson[r].earthquake.maxScale_ja}</div>
             <div class="recent-quake-right-info recent-quake-right-contents">
                 <div class="recent-quake-right-info-time recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-time-title-ja recent-quake-right-info-contents-title-ja">時刻</div>
                     <div class="recent-quake-right-info-time-title-en recent-quake-right-info-contents-title-en">time</div>
-                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{Rjson[0].earthquake.time}</div>
+                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{Rjson[r].earthquake.time}</div>
                 </div>
                 <div class="recent-quake-right-info-intensity recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-intensity-title-ja recent-quake-right-info-contents-title-ja">最大震度</div>
                     <div class="recent-quake-right-info-intensity-title-en recent-quake-right-info-contents-title-en">max intensity</div>
-                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{Rjson[0].earthquake.maxScale_ja}</div>
+                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{Rjson[r].earthquake.maxScale_ja}</div>
                 </div>
                 <div class="recent-quake-right-info-magunitude recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-magunitude-title-ja recent-quake-right-info-contents-title-ja">マグニチュード</div>
@@ -622,9 +648,9 @@
                     <div class="recent-quake-right-info-area-title-en recent-quake-right-info-contents-title-en">intensity in each area</div>
                     <div class="recent-quake-right-info-area-area recent-quake-right-info-contents-content">
                         {#each changeArray as change}
-                        {#if Rjson[0].arrayScale2[change].length > 0}
+                        {#if Rjson[r].arrayScale2[change].length > 0}
                         <div class="recent-quake-right-info-area-area-intencity" style="border-bottom:2px solid {convertColor[change][0]};">震度{convertScales[change]}</div>
-                        {#each Rjson[0].arrayScale2[change] as location}
+                        {#each Rjson[r].arrayScale2[change] as location}
                         <div class="recent-quake-right-info-area-area-name">{location}</div>
                         {/each}
                         {/if}
@@ -632,37 +658,37 @@
                     </div>
                 </div>
             </div>
-            {:else if (Rjson[0].issue.type == "ScaleAndDestination")}
-            {#if (Rjson[0].issue.correct !== "None")}
-            <div class="recent-quake-right-correct">訂正報 {correct[Rjson[0].issue.correct]}に関して</div>
+            {:else if (Rjson[r].issue.type == "ScaleAndDestination")}
+            {#if (Rjson[r].issue.correct !== "None")}
+            <div class="recent-quake-right-correct">訂正報 {correct[Rjson[r].issue.correct]}に関して</div>
             {/if}
-            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{change_color_intensity[Rjson[0].earthquake.maxScale][0]}; color:{change_color_intensity[Rjson[0].earthquake.maxScale][1]};">{Rjson[0].earthquake.maxScale_ja}</div>
+            <div class="recent-quake-right-color-bar recent-quake-right-contents" style="background-color:{change_color_intensity[Rjson[r].earthquake.maxScale][0]}; color:{change_color_intensity[Rjson[r].earthquake.maxScale][1]};">{Rjson[r].earthquake.maxScale_ja}</div>
             <div class="recent-quake-right-info recent-quake-right-contents">
                 <div class="recent-quake-right-info-time recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-time-title-ja recent-quake-right-info-contents-title-ja">時刻</div>
                     <div class="recent-quake-right-info-time-title-en recent-quake-right-info-contents-title-en">time</div>
-                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{Rjson[0].earthquake.time}</div>
+                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{Rjson[r].earthquake.time}</div>
                 </div>
                 <div class="recent-quake-right-info-intensity recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-intensity-title-ja recent-quake-right-info-contents-title-ja">最大震度</div>
                     <div class="recent-quake-right-info-intensity-title-en recent-quake-right-info-contents-title-en">max intensity</div>
-                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{Rjson[0].earthquake.maxScale_ja}</div>
+                    <div class="recent-quake-right-info-intensity-intensity recent-quake-right-info-contents-content">{Rjson[r].earthquake.maxScale_ja}</div>
                 </div>
                 <div class="recent-quake-right-info-magunitude recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-magunitude-title-ja recent-quake-right-info-contents-title-ja">マグニチュード</div>
                     <div class="recent-quake-right-info-magunitude-title-en recent-quake-right-info-contents-title-en">magunitude</div>
-                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{Rjson[0].earthquake.hypocenter.magnitude}</div>
+                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{Rjson[r].earthquake.hypocenter.magnitude}</div>
                 </div>
                 <div class="recent-quake-right-info-hypocenter recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-hypocenter-title-ja recent-quake-right-info-contents-title-ja">震源</div>
                     <div class="recent-quake-right-info-hypocenter-title-en recent-quake-right-info-contents-title-en">hypocenter</div>
-                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">{Rjson[0].earthquake.hypocenter.name}</div>
+                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">{Rjson[r].earthquake.hypocenter.name}</div>
                 </div>
                 <div class="recent-quake-right-info-depth recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-depth-title-ja recent-quake-right-info-contents-title-ja">深さ</div>
                     <div class="recent-quake-right-info-depth-title-en recent-quake-right-info-contents-title-en">depth of the hypocenter</div>
-                    {#if Rjson[0].earthquake.hypocenter.depth !== 0}
-                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">約{Rjson[0].earthquake.hypocenter.depth}km</div>
+                    {#if Rjson[r].earthquake.hypocenter.depth !== 0}
+                    <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">約{Rjson[r].earthquake.hypocenter.depth}km</div>
                     {:else}
                     <div class="recent-quake-right-info-depth-depth recent-quake-right-info-contents-content">ごく浅い</div>
                     {/if}
@@ -670,16 +696,16 @@
                 <div class="recent-quake-right-info-tsunami recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-tsunami-title-ja recent-quake-right-info-contents-title-ja">津波</div>
                     <div class="recent-quake-right-info-tsunami-title-en recent-quake-right-info-contents-title-en">possibility of tsunami</div>
-                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{Rjson[0].earthquake.domesticTsunami_ja}</div>
+                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{Rjson[r].earthquake.domesticTsunami_ja}</div>
                 </div>
                 <div class="recent-quake-right-info-area recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-area-title-ja recent-quake-right-info-contents-title-ja">各地の震度</div>
                     <div class="recent-quake-right-info-area-title-en recent-quake-right-info-contents-title-en">intensity in each area</div>
                     <div class="recent-quake-right-info-area-area recent-quake-right-info-contents-content">
                         {#each changeArray as change}
-                        {#if Rjson[0].arrayScale2[change].length > 0}
+                        {#if Rjson[r+1].arrayScale2[change].length > 0}
                         <div class="recent-quake-right-info-area-area-intencity" style="border-bottom:2px solid {convertColor[change][0]};">震度{convertScales[change]}</div>
-                        {#each Rjson[0].arrayScale2[change] as location}
+                        {#each Rjson[r+1].arrayScale2[change] as location}
                         <div class="recent-quake-right-info-area-area-name">{location}</div>
                         {/each}
                         {/if}
@@ -687,16 +713,16 @@
                     </div>
                 </div>
             </div>
-            {:else if (Rjson[0].issue.type == "Foreign")}
-            {#if (Rjson[0].issue.correct !== "None")}
-            <div class="recent-quake-right-correct">訂正報 {correct[Rjson[0].issue.correct]}に関して</div>
+            {:else if (Rjson[r].issue.type == "Foreign")}
+            {#if (Rjson[r].issue.correct !== "None")}
+            <div class="recent-quake-right-correct">訂正報 {correct[Rjson[r].issue.correct]}に関して</div>
             {/if}
             <div class="recent-quake-right-color-bar recent-quake-right-contents" style="font-size:26px;margin-top:5px;">海外地震情報</div>
             <div class="recent-quake-right-info recent-quake-right-contents">
                 <div class="recent-quake-right-info-time recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-time-title-ja recent-quake-right-info-contents-title-ja">時刻</div>
                     <div class="recent-quake-right-info-time-title-en recent-quake-right-info-contents-title-en">time</div>
-                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{Rjson[0].earthquake.time}</div>
+                    <div class="recent-quake-right-info-time-time recent-quake-right-info-contents-content">{Rjson[r].earthquake.time}</div>
                 </div>
                 <div class="recent-quake-right-info-intensity recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-intensity-title-ja recent-quake-right-info-contents-title-ja">最大震度</div>
@@ -706,12 +732,12 @@
                 <div class="recent-quake-right-info-magunitude recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-magunitude-title-ja recent-quake-right-info-contents-title-ja">マグニチュード</div>
                     <div class="recent-quake-right-info-magunitude-title-en recent-quake-right-info-contents-title-en">magunitude</div>
-                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{Rjson[0].earthquake.hypocenter.magnitude}</div>
+                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{Rjson[r].earthquake.hypocenter.magnitude}</div>
                 </div>
                 <div class="recent-quake-right-info-hypocenter recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-hypocenter-title-ja recent-quake-right-info-contents-title-ja">震源</div>
                     <div class="recent-quake-right-info-hypocenter-title-en recent-quake-right-info-contents-title-en">hypocenter</div>
-                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">{Rjson[0].earthquake.hypocenter.name}</div>
+                    <div class="recent-quake-right-info-hypocenter-hypocenter recent-quake-right-info-contents-content">{Rjson[r].earthquake.hypocenter.name}</div>
                 </div>
                 <div class="recent-quake-right-info-depth recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-depth-title-ja recent-quake-right-info-contents-title-ja">深さ</div>
@@ -721,7 +747,7 @@
                 <div class="recent-quake-right-info-tsunami recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-tsunami-title-ja recent-quake-right-info-contents-title-ja">津波</div>
                     <div class="recent-quake-right-info-tsunami-title-en recent-quake-right-info-contents-title-en">possibility of tsunami</div>
-                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{domesticTsunami[Rjson[0].earthquake.domesticTsunami]}</div>
+                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{domesticTsunami[Rjson[r].earthquake.domesticTsunami]}</div>
                 </div>
                 <div class="recent-quake-right-info-area recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-area-title-ja recent-quake-right-info-contents-title-ja">各地の震度</div>
@@ -920,6 +946,9 @@
     </div>
 </div>
 
+{#if $read_me}
+<Read_me/>
+{/if}
 
 <style>
     .parent{
@@ -946,11 +975,16 @@
             grid-template-columns: 90%;
         }   
     }
+    .modal-open{
+        position:fixed;
+        top: var(--y_value);
+        left:0;
+    }
     .logo{
         grid-area:1/1/2/2;
         display:flex;
-        justify-content: flex-start;
-        align-items: flex-end;
+        justify-content: space-between;
+        align-items: center;
     }
     @media (max-width: 930px){
         .logo{
@@ -977,12 +1011,30 @@
             margin-left:0px;
         }
     }
+    .github{
+        display:flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+    }
     .github-img{
-        width:32px;
-        height:32px;
+        width:28px;
+        height:28px;
     }
     .github-text{
-        font-size:14px;
+        font-size:12px;
+    }
+    .read{
+        display:flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+    }
+    .read-icon{
+
+    }
+    .read-text{
+        font-size:12px;
     }
     .EEW-detection{
         grid-area:1/2/2/4;
