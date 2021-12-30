@@ -449,16 +449,16 @@
         <div class="logo-inner">observer<br>4375</div>
         <div style="width:40px; height:100%;"></div>
         <div class="github">
-            <a href="https://github.com/taro-core2duo/observer-4375">
+            <a href="https://github.com/taro-core2duo/observer-4375" target="_blank">
                 <img src="GitHub-Mark-64px.png" alt="github" class="github-img">
             </a>
-            <a href="https://github.com/taro-core2duo/observer-4375">
+            <a href="https://github.com/taro-core2duo/observer-4375" class="github-link" target="_blank">
                 <p class="github-text">github</p>
             </a>
         </div>
         <div class="read" on:click={open_read_me}>
             <i class="fas fa-book-open fa-2x fa-fw read-icon" ></i>
-            <p class="read-text">read me</p>
+            <p class="read-text">read</p>
         </div>
     </div>
     <div class="EEW-detection contents">
@@ -1020,6 +1020,12 @@
     .github-img{
         width:28px;
         height:28px;
+    }
+    .github-link{
+        text-decoration: none;
+    }
+    .github-link:visited{
+        color:#000000;
     }
     .github-text{
         font-size:12px;
