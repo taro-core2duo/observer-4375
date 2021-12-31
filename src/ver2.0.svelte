@@ -12,6 +12,7 @@
     import { convertScales } from "./convertScales"
     import { confidence } from "./confidence"
     import { city } from "./city"
+    import { correct } from "./correct"
     import { scales_for_map } from "./scales-for-map"
     import {LeafletMap, Icon, Marker, TileLayer} from 'svelte-leafletjs';
     import moment from 'moment';
@@ -19,7 +20,6 @@
 
 
     const get = () => {
-        console.log(Rjson)
         for(let e = 0; e < Rjson.length; e++){
             let info = Rjson[e]
             //各地の震度に関する情報の場合
@@ -275,7 +275,7 @@
     get();
     get_userQuake();
 
-    //繰り返し取得（20秒ごと）
+    //繰り返し取得（20秒ごと）（最新の地震情報）
     setInterval(function(){
         try{
             apiHttps = new XMLHttpRequest();
@@ -284,17 +284,33 @@
             const log = apiHttps.responseText;
             Rjson = JSON.parse(log);
             if( lastJson !== log ){
-                console.log("diff")
                 setTimeout(window.location.reload(), 10000)
             }
             lastJson = log
+        }catch(e){
+            console.log(e)
+        };
 
+        //処理実行
+        get()
+    },20000);
+
+    //繰り返し取得（60秒ごと）（過去の地震情報）
+    setInterval(function(){
+        try{
             const lastQuake = new XMLHttpRequest();
             lastQuake.open("GET", "https://api.p2pquake.net/v2/jma/quake?limit=10&quake_type=DetailScale", false);
             lastQuake.send();
             const logQuakes = lastQuake.responseText;
             lastQuakeJson = JSON.parse(logQuakes);
-            
+        }catch(e){
+            console.log(e)
+        };
+    },60000);
+
+    //繰り返し取得（30秒ごと）（津波情報）
+    setInterval(function(){
+        try{
             const tsunami = new XMLHttpRequest();
             tsunami.open("GET", "https://api.p2pquake.net/v2/history?codes=522&limit=4", false);
             tsunami.send();
@@ -303,10 +319,7 @@
         }catch(e){
             console.log(e)
         };
-
-        //処理実行
-        get()
-    },20000);
+    },30000);
 
     //繰り返し取得（10秒ごと）（地震感知情報）
     setInterval(function(){
@@ -332,9 +345,6 @@
     const getDate = () => {
         date = moment();
         nowDate = Number(date.format('YYYYMMDDHHmmss'))
-        console.log(date)
-        console.log(nowDate)
-        console.log(moment(nowDate, "YYYYMMDDHHmmss").diff(moment(userQuakeJson[0].updated_at.replace(/\/|:|\s/g,""), "YYYYMMDDHHmmss.sss"), "seconds"))
     }
     setInterval(getDate,1000)
     
@@ -397,7 +407,6 @@
             sumlat += Number(replacedLat)
             sumlon += Number(replacedLon)
         }
-        console.log(sumlat,sumlon)
         noHypocenter =  {
             center: [sumlat / Number(data_for_map.points.length),sumlon / Number(data_for_map.points.length)],
             zoom: 7,
@@ -413,7 +422,6 @@
     const open_read_me = () => {
         y_number = "-" + window.scrollY + "px"
         y.set(y_number)
-        console.log(y_number)
         read_me.set(true)
     }
 </script>
