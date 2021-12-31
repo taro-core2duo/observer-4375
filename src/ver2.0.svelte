@@ -1,6 +1,6 @@
 <script>
     import Read_me from './read_me.svelte'
-    import { read_me ,y } from "./stores"
+    import { read_me , y } from "./stores"
     import { pointData } from "./points.js"
     import { quakeScale } from "./quakeScale"
     import { areaName } from "./areaName"
@@ -10,25 +10,13 @@
     import { tsunami_type } from "./tsunami-type"
     import { changeArray } from "./changeArray"
     import { convertScales } from "./convertScales"
-    import { confidence} from "./confidence"
+    import { confidence } from "./confidence"
     import { city } from "./city"
-    import { sample1 } from "./sample1"
-    import { sample2 } from "./sample2"
-    import { sample3 } from "./sample3"
-    import { sample4 } from "./sample4"
-    import { prompt } from "./prompt"
-    import { chiba } from "./chiba"
-    import { foreign } from "./foreign"
-    import { wakayama } from "./wakayama"
-    import { other } from "./other"
     import { scales_for_map } from "./scales-for-map"
-    import { correct } from "./correct"
     import {LeafletMap, Icon, Marker, TileLayer} from 'svelte-leafletjs';
     import moment from 'moment';
     import { onMount } from "svelte";
 
-
-    //let quake = []
 
     const get = () => {
         console.log(Rjson)
@@ -283,15 +271,6 @@
         setTimeout(window.location.reload(), 3000)
     };
 
-    //userQuakeJson[0] = sample2
-    //tsunamiJson[0] = sample3[0]
-    //Rjson[0] = sample4[6]
-    //Rjson[0] = prompt[2]
-    //Rjson[0] = chiba[3]
-    //Rjson[0] = wakayama[2]
-    //Rjson[0] = foreign[0]
-    //Rjson = other
-
     //処理を実行
     get();
     get_userQuake();
@@ -324,13 +303,6 @@
         }catch(e){
             console.log(e)
         };
-        //tsunamiJson[0] = sample3[0]
-        //Rjson[0] = sample4[6]
-        //Rjson[0] = prompt[2]
-        //Rjson[0] = chiba[3]
-        //Rjson[0] = wakayama[2]
-        //Rjson[0] = foreign[0]
-        //Rjson = other
 
         //処理実行
         get()
@@ -347,7 +319,6 @@
         }catch(e){
             console.log(e)
         };
-        //userQuakeJson[0] = sample2
 
         //処理実行
         get_userQuake()
@@ -374,6 +345,7 @@
         firstChild.remove()
     })
 
+    //その他の情報が発表された際の処理
     let r;
     if(Rjson[0].issue.type !== "Other"){
         r = 0
@@ -435,6 +407,8 @@
     
     let leafletMap;
 
+    //モーダル出現処理
+    //モーダル出現時にスクロール位置を取得し固定する
     let y_number;
     const open_read_me = () => {
         y_number = "-" + window.scrollY + "px"
@@ -445,6 +419,7 @@
 </script>
 
 <div class="parent" class:modal-open={$read_me} id="scroll" style="--y_value:{y_number};">
+    <!--ロゴ部分-->
     <div class="logo contents">
         <div class="logo-inner">observer<br>4375</div>
         <div style="width:40px; height:100%;"></div>
@@ -461,6 +436,7 @@
             <p class="read-text">read</p>
         </div>
     </div>
+    <!--地震感知情報部分-->
     <div class="EEW-detection contents">
         <div class="EEW-detection-left contents-left">
             <div class="EEW-detection-left-explanation contents-left-explanation">
@@ -489,6 +465,7 @@
             {/if}
         </div>
     </div>
+    <!--最新の地震情報部分-->
     <div class="recent-quake contents">
         <div class="recent-quake-left contents-left">
             <div class="recent-quake-left-explanation contents-left-explanation">
@@ -497,6 +474,7 @@
             </div>
         </div>
         <div class="recent-quake-right contents-right">
+            <!--各地の震度に関する情報の時-->
             {#if (Rjson[r].issue.type == "DetailScale")}
             {#if (Rjson[r].issue.correct !== "None")}
             <div class="recent-quake-right-correct">訂正報 {correct[Rjson[r].issue.correct]}に関して</div>
@@ -552,6 +530,7 @@
                     </div>
                 </div>
             </div>
+            <!--震源に関する情報の時-->
             {:else if (Rjson[r].issue.type == "Destination")}
             {#if (Rjson[r].issue.correct !== "None")}
             <div class="recent-quake-right-correct">訂正報 {correct[Rjson[r].issue.correct]}に関して</div>
@@ -607,6 +586,7 @@
                     </div>
                 </div>
             </div>
+            <!--震度速報の時-->
             {:else if (Rjson[r].issue.type == "ScalePrompt")}
             {#if (Rjson[r].issue.correct !== "None")}
             <div class="recent-quake-right-correct">訂正報 {correct[Rjson[r].issue.correct]}に関して</div>
@@ -658,6 +638,7 @@
                     </div>
                 </div>
             </div>
+            <!--震源・震度に関する情報の時-->
             {:else if (Rjson[r].issue.type == "ScaleAndDestination")}
             {#if (Rjson[r].issue.correct !== "None")}
             <div class="recent-quake-right-correct">訂正報 {correct[Rjson[r].issue.correct]}に関して</div>
@@ -713,6 +694,7 @@
                     </div>
                 </div>
             </div>
+            <!--遠地地震に関する情報の時-->
             {:else if (Rjson[r].issue.type == "Foreign")}
             {#if (Rjson[r].issue.correct !== "None")}
             <div class="recent-quake-right-correct">訂正報 {correct[Rjson[r].issue.correct]}に関して</div>
@@ -758,6 +740,7 @@
             {/if}
         </div>
     </div>
+    <!--震度分布図部分-->
     <div class="distribution contents">
         <div class="distribution-left contents-left">
             <div class="distribution-left-explanation contents-left-explanation">
@@ -767,6 +750,7 @@
         </div>
         <div class="distribution-right contents-right">
             <div class="distribution-right-map">
+                <!--各地の震度に関する情報の時-->
                 {#if data_for_map.issue.type == "DetailScale"}
                 <LeafletMap bind:this={leafletMap} options={mapOptions}>
                     <TileLayer url={tileUrl} options={tileLayerOptions}/>
@@ -787,6 +771,7 @@
                         </Marker>
                     {/if}
                 </LeafletMap>
+                <!--震源に関する情報の時-->
                 {:else if data_for_map.issue.type == "Destination"}
                 <LeafletMap bind:this={leafletMap} options={mapOptions}>
                     <TileLayer url={tileUrl} options={tileLayerOptions}/>
@@ -807,6 +792,7 @@
                     </Marker>
                     {/if}
                 </LeafletMap>
+                <!--震度速報の時-->
                 {:else if data_for_map.issue.type == "ScalePrompt"}
                 <LeafletMap bind:this={leafletMap} options={noHypocenter}>
                     <TileLayer url={tileUrl} options={tileLayerOptions}/>
@@ -822,6 +808,7 @@
                         {/each}
                     {/each}
                 </LeafletMap>
+                <!--震源・震度に関する情報の時-->
                 {:else if data_for_map.issue.type == "ScaleAndDestination"}
                     {#if data_for_map.points.length !== 0}
                     <LeafletMap bind:this={leafletMap} options={mapOptions}>
@@ -864,6 +851,7 @@
                         {/if}
                     </LeafletMap>
                     {/if}
+                <!--遠地地震に関する情報の時-->
                 {:else if data_for_map.issue.type == "Foreign"}
                     <LeafletMap bind:this={leafletMap} options={options_for_foreign}>
                         <TileLayer url={tileUrl} options={tileLayerOptions}/>
@@ -875,6 +863,7 @@
             </div>
         </div>
     </div>
+    <!--過去の地震情報部分-->
     <div class="past-quake contents">
         <div class="past-quake-left contents-left">
             <div class="past-quake-left-explanation contents-left-explanation">
@@ -899,6 +888,7 @@
             {/each}
         </div>
     </div>
+    <!--津波情報部分-->
     <div class="tsunami contents">
         <div class="tsunami-left contents-left">
             <div class="tsunami-left-explanation contents-left-explanation">
@@ -946,6 +936,7 @@
     </div>
 </div>
 
+<!--readme出現処理-->
 {#if $read_me}
 <Read_me/>
 {/if}
@@ -1223,6 +1214,7 @@
         }
     }
     .recent-quake-right-color-bar{
+        padding-right:5px;
         text-align:right;
         font-size:36px;
     }
@@ -1625,6 +1617,7 @@
         display:inline-block;
     }
     .recent-quake-right-info-contents-content{
+        margin-top:5px;
         margin-left:30px;
         font-size:24px;
     }
