@@ -1,10 +1,12 @@
 <script>
     import { read_me } from "./stores"
 
+    //モーダル消去処理
     const close_read_me = () => {
         read_me.set(false)
     }
 
+    //スクロール禁止処理
     export function clickOutside(node) {
   
     const handleClick = event => {
