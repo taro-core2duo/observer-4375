@@ -12,6 +12,7 @@
     import { convertScales } from "./convertScales"
     import { confidence } from "./confidence"
     import { city } from "./city"
+    import { correct } from "./correct"
     import { scales_for_map } from "./scales-for-map"
     import {LeafletMap, Icon, Marker, TileLayer} from 'svelte-leafletjs';
     import moment from 'moment';
@@ -306,7 +307,7 @@
 
         //処理実行
         get()
-    },20000);
+    },30000);
 
     //繰り返し取得（10秒ごと）（地震感知情報）
     setInterval(function(){
