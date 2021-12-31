@@ -22,9 +22,9 @@
 
 ### その他
 
-地震情報は[P2P地震情報様のJSON API v2]([JSON API v2 · P2P地震情報 (p2pquake.net)](https://www.p2pquake.net/json_api_v2/#menu))を利用させていただいています。
+地震情報は([JSON API v2 · P2P地震情報 (p2pquake.net)](https://www.p2pquake.net/json_api_v2/#menu))を利用させていただいています。
 
-[P2P地震情報様のJSON API v2]([JSON API v2 · P2P地震情報 (p2pquake.net)](https://www.p2pquake.net/json_api_v2/#menu))は気象庁 地震情報・津波予報: CC BY 4.0 準拠しており、その旨をここに示しておきます。
+([JSON API v2 · P2P地震情報 (p2pquake.net)](https://www.p2pquake.net/json_api_v2/#menu))は気象庁 地震情報・津波予報: CC BY 4.0 準拠しており、その旨をここに示しておきます。
 
 
 
