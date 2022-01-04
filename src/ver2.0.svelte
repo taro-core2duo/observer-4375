@@ -15,6 +15,7 @@
     import { correct } from "./correct"
     import { scales_for_map } from "./scales-for-map"
     import {LeafletMap, Icon, Marker, TileLayer} from 'svelte-leafletjs';
+    import { convertScales_for_past } from "./convertScales_for_past"
     import moment from 'moment';
     import { onMount } from "svelte";
 
@@ -453,7 +454,7 @@
             </div>
         </div>
         <div class="EEW-detection-right contents-right">
-            {#if userQuakeJson[0].confidence != 0 && (moment(nowDate, "YYYYMMDDHHmmss.sss").diff(moment(userQuakeJson[0].updated_at.replace(/\/|:|\s/g,""), "YYYYMMDDHHmmss.sss"), "seconds") <= 300 ) && (moment(nowDate, "YYYYMMDDHHmmss.sss").diff(moment(userQuakeJson[0].updated_at.replace(/\/|:|\s/g,""), "YYYYMMDDHHmmss.sss"), "seconds") >= 0 )}
+            {#if userQuakeJson[0].confidence !== 0 && (moment(nowDate, "YYYYMMDDHHmmss.sss").diff(moment(userQuakeJson[0].updated_at.replace(/\/|:|\s/g,""), "YYYYMMDDHHmmss.sss"), "seconds") <= 300 ) && (moment(nowDate, "YYYYMMDDHHmmss.sss").diff(moment(userQuakeJson[0].updated_at.replace(/\/|:|\s/g,""), "YYYYMMDDHHmmss.sss"), "seconds") >= 0 )}
                 <div class="EEW-detection-right-time">{userQuakeJson[0].updated_at}</div>
                 <div class="EEW-detection-right-happen">地震発生の可能性</div>
                 <div class="EEW-detection-right-area">
@@ -890,7 +891,7 @@
                     <div class="past-quake-right-each-info2-magunitude"><span style="font-size:20px;">M</span>{recentQuake.earthquake.hypocenter.magnitude}</div>
                 </div>
                 <div class="past-quake-right-each-info3">
-                    <div class="past-quake-right-each-info3-inner" style="background-color:{change_color_intensity[recentQuake.earthquake.maxScale][0]}; color:{change_color_intensity[recentQuake.earthquake.maxScale][1]};">{quakeScale[recentQuake.earthquake.maxScale]}</div>
+                    <div class="past-quake-right-each-info3-inner" style="background-color:{change_color_intensity[recentQuake.earthquake.maxScale][0]}; color:{change_color_intensity[recentQuake.earthquake.maxScale][1]};">{convertScales_for_past[recentQuake.earthquake.maxScale]}</div>
                 </div>                
             </div>
             {/each}
@@ -1385,6 +1386,11 @@
         place-content: end center;
         margin-top:5px;
     }
+    @media (max-width: 320px){
+        .past-quake-right-each-info{
+            grid-template-columns:55% 20% 25%;
+        }
+    }
     .past-quake-right-each-info1{
         grid-area:1/1/2/2;
         margin-bottom:10px;
@@ -1399,7 +1405,7 @@
     }
     @media (max-width: 320px){
         .past-quake-right-each-info1-time{
-            font-size:14px;
+            font-size:12px;
         }
     }
     .past-quake-right-each-info2{
