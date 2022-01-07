@@ -877,7 +877,7 @@
         <div class="past-quake-left contents-left">
             <div class="past-quake-left-explanation contents-left-explanation">
                 <div class="past-quake-left-explanation-ja contents-left-explanation-ja">過去の地震</div>
-                <div class="past-quake-left-explanation-en contents-left-explanation-en">rececnt<br>earthquake</div>
+                <div class="past-quake-left-explanation-en contents-left-explanation-en">past<br>earthquake</div>
             </div>
         </div>
         <div class="past-quake-right contents-right" id="RecentQuake">
