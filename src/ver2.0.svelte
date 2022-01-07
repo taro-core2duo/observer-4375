@@ -450,7 +450,7 @@
         <div class="EEW-detection-left contents-left">
             <div class="EEW-detection-left-explanation contents-left-explanation">
                 <div class="EEW-detection-left-explanation-ja contents-left-explanation-ja">地震感知情報</div>
-                <div class="EEW-detection-left-explanation-en contents-left-explanation-en">earthquake<br>ditection</div>
+                <div class="EEW-detection-left-explanation-en contents-left-explanation-en">earthquake<br>detection</div>
             </div>
         </div>
         <div class="EEW-detection-right contents-right">
@@ -479,7 +479,7 @@
         <div class="recent-quake-left contents-left">
             <div class="recent-quake-left-explanation contents-left-explanation">
                 <div class="recent-quake-left-explanation-ja contents-left-explanation-ja">最新の地震</div>
-                <div class="recent-quake-left-explanation-en contents-left-explanation-en">rececnt<br>earthquake</div>
+                <div class="recent-quake-left-explanation-en contents-left-explanation-en">latest<br>earthquake</div>
             </div>
         </div>
         <div class="recent-quake-right contents-right">
@@ -754,7 +754,7 @@
         <div class="distribution-left contents-left">
             <div class="distribution-left-explanation contents-left-explanation">
                 <div class="distribution-left-explanation-ja contents-left-explanation-ja">震度分布</div>
-                <div class="distribution-left-explanation-en contents-left-explanation-en">rececnt<br>earthquake's<br>intensity<br>distribution</div>
+                <div class="distribution-left-explanation-en contents-left-explanation-en">latest<br>earthquake's<br>intensity<br>distribution</div>
             </div>
         </div>
         <div class="distribution-right contents-right">
@@ -877,7 +877,7 @@
         <div class="past-quake-left contents-left">
             <div class="past-quake-left-explanation contents-left-explanation">
                 <div class="past-quake-left-explanation-ja contents-left-explanation-ja">過去の地震</div>
-                <div class="past-quake-left-explanation-en contents-left-explanation-en">rececnt<br>earthquake</div>
+                <div class="past-quake-left-explanation-en contents-left-explanation-en">past<br>earthquake</div>
             </div>
         </div>
         <div class="past-quake-right contents-right" id="RecentQuake">
