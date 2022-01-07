@@ -450,7 +450,7 @@
         <div class="EEW-detection-left contents-left">
             <div class="EEW-detection-left-explanation contents-left-explanation">
                 <div class="EEW-detection-left-explanation-ja contents-left-explanation-ja">地震感知情報</div>
-                <div class="EEW-detection-left-explanation-en contents-left-explanation-en">earthquake<br>ditection</div>
+                <div class="EEW-detection-left-explanation-en contents-left-explanation-en">earthquake<br>detection</div>
             </div>
         </div>
         <div class="EEW-detection-right contents-right">
