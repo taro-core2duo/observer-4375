@@ -437,7 +437,7 @@
                 <img src="GitHub-Mark-64px.png" alt="github" class="github-img">
             </a>
             <a href="https://github.com/taro-core2duo/observer-4375" class="github-link" target="_blank">
-                <p class="github-text">github</p>
+                <p class="github-text">GitHub</p>
             </a>
         </div>
         <div class="read" on:click={open_read_me}>
