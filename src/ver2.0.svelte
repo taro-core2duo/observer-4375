@@ -724,7 +724,11 @@
                 <div class="recent-quake-right-info-magunitude recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-magunitude-title-ja recent-quake-right-info-contents-title-ja">マグニチュード</div>
                     <div class="recent-quake-right-info-magunitude-title-en recent-quake-right-info-contents-title-en">magunitude</div>
+                    {#if Rjson[r].earthquake.hypocenter.magnitude == -1}
+                    <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">不明</div>
+                    {:else}
                     <div class="recent-quake-right-info-magunitude-magunitude recent-quake-right-info-contents-content">{Rjson[r].earthquake.hypocenter.magnitude}</div>
+                    {/if}
                 </div>
                 <div class="recent-quake-right-info-hypocenter recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-hypocenter-title-ja recent-quake-right-info-contents-title-ja">震源</div>
