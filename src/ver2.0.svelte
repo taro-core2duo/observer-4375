@@ -256,7 +256,7 @@
         userQuakeJson = JSON.parse(userQuakeLog);
 
         const tsunami = new XMLHttpRequest();
-        tsunami.open("GET", "https://api.p2pquake.net/v2/history?codes=522&limit=4", false);
+        tsunami.open("GET", "https://api.p2pquake.net/v2/history?codes=552", false);
         tsunami.onreadystatechange = function(){
             if(this.readyState === 4 && this.status === 200){
                 console.log("success")
@@ -275,6 +275,7 @@
     //処理を実行
     get();
     get_userQuake();
+    console.log(tsunamiJson)
 
     //繰り返し取得（20秒ごと）（最新の地震情報）
     setInterval(function(){
@@ -313,7 +314,7 @@
     setInterval(function(){
         try{
             const tsunami = new XMLHttpRequest();
-            tsunami.open("GET", "https://api.p2pquake.net/v2/history?codes=522&limit=4", false);
+            tsunami.open("GET", "https://api.p2pquake.net/v2/history?codes=552", false);
             tsunami.send();
             const tsunamiLog = tsunami.responseText;
             tsunamiJson = JSON.parse(tsunamiLog);
