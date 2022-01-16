@@ -352,9 +352,11 @@
     
     //過去の地震情報のはじめの子要素削除
     onMount(() => {
-        const RecentQuake = document.getElementById("RecentQuake")
-        const firstChild = RecentQuake.firstChild
-        firstChild.remove()
+        if(Rjson[0].earthquake.time == lastQuakeJson[0].earthquake.time){
+            const RecentQuake = document.getElementById("RecentQuake")
+            const firstChild = RecentQuake.firstChild
+            firstChild.remove()
+        } 
     })
 
     //その他の情報が発表された際の処理
