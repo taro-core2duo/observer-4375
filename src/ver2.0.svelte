@@ -351,14 +351,16 @@
     setInterval(getDate,1000)
     
     //過去の地震情報のはじめの子要素削除
+    let changed;
     onMount(() => {
         if(Rjson[0].earthquake.time == lastQuakeJson[0].earthquake.time){
             const RecentQuake = document.getElementById("RecentQuake")
             const firstChild = RecentQuake.firstChild
             firstChild.remove()
+            changed = true
         }
         setInterval(function(){
-            if(Rjson[0].earthquake.time == lastQuakeJson[0].earthquake.time){
+            if(Rjson[0].earthquake.time == lastQuakeJson[0].earthquake.time && changed !== true){
                 const RecentQuake = document.getElementById("RecentQuake")
                 const firstChild = RecentQuake.firstChild
                 firstChild.remove()
