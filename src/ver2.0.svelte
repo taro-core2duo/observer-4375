@@ -356,7 +356,14 @@
             const RecentQuake = document.getElementById("RecentQuake")
             const firstChild = RecentQuake.firstChild
             firstChild.remove()
-        } 
+        }
+        setInterval(function(){
+            if(Rjson[0].earthquake.time == lastQuakeJson[0].earthquake.time){
+                const RecentQuake = document.getElementById("RecentQuake")
+                const firstChild = RecentQuake.firstChild
+                firstChild.remove()
+            }
+        }, 60000)
     })
 
     //その他の情報が発表された際の処理
