@@ -207,6 +207,25 @@
     let lastJson;
     let apiHttps;
     let tsunamiJson;
+    let log;
+
+    let r;
+
+    let data_for_map;
+    let data_for_map2; 
+
+    let mapOptions;
+
+    let options_for_foreign;
+    
+    let sumlat = 0;
+    let sumlon = 0;
+    let noHypocenter;
+
+    let iconOptions;
+
+    let mapChange;
+
 
 
     //APIの取得（初期読み込み時）
@@ -222,10 +241,11 @@
             }
         }
         apiHttps.send();
-        let log = apiHttps.responseText;
+        log = apiHttps.responseText;
         Rjson = JSON.parse(log);
         //はじめのレスポンステキストをlastJsonとする
         lastJson = log
+        
 
         const lastQuake = new XMLHttpRequest();
         lastQuake.open("GET", "https://api.p2pquake.net/v2/jma/quake?limit=10&quake_type=DetailScale", false);
@@ -275,7 +295,55 @@
     //処理を実行
     get();
     get_userQuake();
-    console.log(tsunamiJson)
+
+    //マップ生成処理
+    //その他の情報を排除
+    if(Rjson[0].issue.type !== "Other"){
+        r = 0
+    }else{
+        r = 1
+    }
+
+    //情報の定義
+    data_for_map = Rjson[r]
+    data_for_map2 = Rjson[r+1]
+
+    //通常時のマップのセンターと拡大率
+    mapOptions = {
+        center: [data_for_map.earthquake.hypocenter.latitude, data_for_map.earthquake.hypocenter.longitude],
+        zoom: 9,
+    };
+
+    //海外地震の際のマップのセンターと拡大率
+    options_for_foreign = {
+        center: [data_for_map.earthquake.hypocenter.latitude, data_for_map.earthquake.hypocenter.longitude],
+        zoom: 2,
+    }
+
+    //震度情報の際の処理　各地の座標を平均して中央に割り当てる
+    if(data_for_map.issue.type == "ScalePrompt"){
+        for(let i = 0; i < data_for_map.points.length; i++){
+            let replacedLat = data_for_map.points[i].lat
+            let replacedLon = data_for_map.points[i].lon
+            sumlat += Number(replacedLat)
+            sumlon += Number(replacedLon)
+        }
+        noHypocenter =  {
+            center: [sumlat / Number(data_for_map.points.length),sumlon / Number(data_for_map.points.length)],
+            zoom: 7,
+        }
+    }
+
+    //センターアイコンの設定
+    iconOptions = {
+        iconUrl: '/scale/center.png',
+        iconSize: [30, 30],
+        iconAnchor:[15,15]
+    };
+
+    //マップ変更を司る係数
+    mapChange = Rjson[0]
+
 
     //繰り返し取得（20秒ごと）（最新の地震情報）
     setInterval(function(){
@@ -283,18 +351,75 @@
             apiHttps = new XMLHttpRequest();
             apiHttps.open("GET", "https://api.p2pquake.net/v2/history?codes=551&limit=3", false);
             apiHttps.send();
-            const log = apiHttps.responseText;
+             log = apiHttps.responseText;
             Rjson = JSON.parse(log);
-            if( lastJson !== log ){
-                setTimeout(window.location.reload(), 10000)
-            }
-            lastJson = log
+            
+
         }catch(e){
             console.log(e)
         };
 
         //処理実行
         get()
+
+        //情報の更新があるとき
+        if(lastJson !== log){
+            //その他の情報を排除
+            if(Rjson[0].issue.type !== "Other"){
+                r = 0
+            }else{
+                r = 1
+            }
+
+            //情報の定義
+            data_for_map = Rjson[r]
+            data_for_map2 = Rjson[r+1]
+
+            //通常時のマップのセンターと拡大率
+            mapOptions = {
+                center: [data_for_map.earthquake.hypocenter.latitude, data_for_map.earthquake.hypocenter.longitude],
+                zoom: 9,
+            };
+
+            //海外地震の際のマップのセンターと拡大率
+            options_for_foreign = {
+                center: [data_for_map.earthquake.hypocenter.latitude, data_for_map.earthquake.hypocenter.longitude],
+                zoom: 2,
+            }
+
+            //共に0に設定
+            sumlat = 0;
+            sumlon = 0;
+            
+            //震度情報の際の処理　各地の座標を平均して中央に割り当てる
+            if(data_for_map.issue.type == "ScalePrompt"){
+                for(let i = 0; i < data_for_map.points.length; i++){
+                    console.log(data_for_map.points[i].lat)
+                    if("lat" in data_for_map.points[i] && "lon" in data_for_map.points[i]){
+                        let replacedLat = data_for_map.points[i].lat
+                        let replacedLon = data_for_map.points[i].lon
+                        sumlat += Number(replacedLat)
+                        sumlon += Number(replacedLon)     
+                    }
+                }
+                noHypocenter =  {
+                    center: [sumlat / Number(data_for_map.points.length), sumlon / Number(data_for_map.points.length)],
+                    zoom: 7,
+                }
+            }
+
+            //センターアイコンの設定
+            iconOptions = {
+                iconUrl: '/scale/center.png',
+                iconSize: [30, 30],
+                iconAnchor:[15,15]
+            };
+
+            //マップ変更を司る係数
+            mapChange = Rjson[0]
+        }
+
+        lastJson = log
     },20000);
 
     //繰り返し取得（60秒ごと）（過去の地震情報）
@@ -368,29 +493,6 @@
         }, 60000)
     })
 
-    //その他の情報が発表された際の処理
-    let r;
-    if(Rjson[0].issue.type !== "Other"){
-        r = 0
-    }else{
-        r = 1
-    } 
-    
-    //マップ用データの定義
-    const data_for_map = Rjson[r]
-    const data_for_map2 = Rjson[r+1]
-
-    //マップの中心の指定
-    const mapOptions = {
-        center: [data_for_map.earthquake.hypocenter.latitude, data_for_map.earthquake.hypocenter.longitude],
-        zoom: 9,
-    };
-
-    //海外地震情報のマップズーム度指定
-    const options_for_foreign = {
-        center: [data_for_map.earthquake.hypocenter.latitude, data_for_map.earthquake.hypocenter.longitude],
-        zoom: 2,
-    }
     //マップのタイルレイヤーの指定
     const tileUrl = "https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png";
 
@@ -403,28 +505,6 @@
     };
 
     //震源アイコンの設定
-    const iconOptions = {
-        iconUrl: '/scale/center.png',
-        iconSize: [30, 30],
-        iconAnchor:[15,15]
-    };
-
-    //震度速報時のマップの中心位置を各観測点の座標の平均より算出
-    let sumlat = 0;
-    let sumlon = 0;
-    let noHypocenter;
-    if(data_for_map.issue.type == "ScalePrompt"){
-        for(let i = 0; i < data_for_map.points.length; i++){
-            let replacedLat = data_for_map.points[i].lat
-            let replacedLon = data_for_map.points[i].lon
-            sumlat += Number(replacedLat)
-            sumlon += Number(replacedLon)
-        }
-        noHypocenter =  {
-            center: [sumlat / Number(data_for_map.points.length),sumlon / Number(data_for_map.points.length)],
-            zoom: 7,
-        }
-    }
     
     
     let leafletMap;
@@ -774,6 +854,7 @@
             </div>
         </div>
         <div class="distribution-right contents-right">
+            {#key mapChange}
             <div class="distribution-right-map">
                 <!--各地の震度に関する情報の時-->
                 {#if data_for_map.issue.type == "DetailScale"}
@@ -886,6 +967,7 @@
                     </LeafletMap>
                 {/if}
             </div>
+            {/key}
         </div>
     </div>
     <!--過去の地震情報部分-->
@@ -960,6 +1042,8 @@
         </div>
     </div>
 </div>
+
+
 
 <!--readme出現処理-->
 {#if $read_me}
