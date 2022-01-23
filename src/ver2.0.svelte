@@ -19,8 +19,6 @@
     import moment from 'moment';
     import { onMount } from "svelte";
 
-    import { sample2 } from "./example/sample2"
-    import { sample3 } from "./example/sample3"
 
 
     const get = () => {
