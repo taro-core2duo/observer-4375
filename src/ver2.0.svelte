@@ -19,7 +19,6 @@
     import moment from 'moment';
     import { onMount } from "svelte";
 
-    
 
 
     const get = () => {
