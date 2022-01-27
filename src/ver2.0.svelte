@@ -210,6 +210,14 @@
     //地震感知情報の処理
     const get_userQuake = () => {
         for(let i = 0; i < userQuakeJson.length; i++){
+            let yyyymmdd = userQuakeJson[i].updated_at.substring(11)
+            console.log(yyyymmdd)
+            let count = yyyymmdd.indexOf(':')
+            if(count == 1){
+                userQuakeJson[i].updated_at = userQuakeJson[i].updated_at.substring(0,11) + "0" + userQuakeJson[i].updated_at.substring(11)
+                console.log(userQuakeJson[i].updated_at)
+            }
+            console.log(count)
             let conf = userQuakeJson[i].confidence
             userQuakeJson[i].confLevel = {}
             //ObjectをArrayに変換
@@ -523,7 +531,6 @@
         }catch(e){
             console.log(e)
         };
-
         //処理実行
         get_userQuake()
     },10000);
