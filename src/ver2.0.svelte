@@ -1211,18 +1211,18 @@
     }
     @media (max-width: 930px){
         .parent{
-            height:calc(200vh - 20px);
+            height:1620px;
             width:calc(100vw - 32px);
-            grid-template-rows: 7.5% 7.5% 30% 25% 15% 15%;
+            grid-template-rows: 150px 140px 400px 350px 280px 280px;
             grid-template-columns: 90%;
         }   
     }
     @media (max-width: 768px){
         .parent{
-            height:calc(230vh - 20px);
+            height:1950px;
             width:calc(100vw - 32px);
-            grid-template-rows: 7.5% 7.5% 30% 15% 15% 25%;
-            grid-template-columns: 90%;
+            grid-template-rows: 100px 220px 520px 450px 320px 320px;
+            grid-template-columns:100%;
         }   
     }
     .modal-open{
@@ -1248,7 +1248,7 @@
     }
     @media (max-width: 640px){
         .parent{
-            display:block;
+            margin-bottom:10px;
         }
     }
     .logo-inner{
@@ -1557,19 +1557,19 @@
     @media (max-width: 930px){
         .distribution-right-map{
             width:calc(90vw - 190px);
-            height:calc(50vh - 25px);
+            height:calc(350px - 25px);
         }
     }
     @media (max-width: 768px){
         .distribution-right-map{
             width:calc(90vw - 190px);
-            height:calc(50vh - 25px);
+            height:calc(350px - 25px);
         }
     }
     @media (max-width: 640px){
         .distribution-right-map{
             width:calc(100vw - 50px);
-            height:calc(50vh - 25px);
+            height:330px;
         } 
     }
     .past-quake{
@@ -1739,7 +1739,7 @@
     }
     @media (max-width: 640px){
         .tsunami-right{
-            height:150px;
+            height:200px;
         } 
     }
     .tsunami-right::-webkit-scrollbar{
