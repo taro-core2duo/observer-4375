@@ -1214,10 +1214,10 @@
             height:1620px;
             width:calc(100vw - 32px);
             grid-template-rows: 150px 140px 400px 350px 280px 280px;
-            grid-template-columns: 90%;
+            grid-template-columns: 100%;
         }   
     }
-    @media (max-width: 768px){
+    @media (max-width: 640px){
         .parent{
             height:1950px;
             width:calc(100vw - 32px);
@@ -1551,19 +1551,19 @@
         } 
     }
     .distribution-right-map{
-        width:calc(55vw - 140px);
+        width:calc(55vw - 120px);
         height:calc(55vh - 30px);
     }
     @media (max-width: 930px){
         .distribution-right-map{
-            width:calc(90vw - 190px);
+            width:calc(100vw - 190px);
             height:calc(350px - 25px);
         }
     }
     @media (max-width: 768px){
         .distribution-right-map{
-            width:calc(90vw - 190px);
-            height:calc(350px - 25px);
+            width:calc(100vw - 190px);
+            height:330px;
         }
     }
     @media (max-width: 640px){
