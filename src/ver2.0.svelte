@@ -565,7 +565,7 @@
     })
 
     //マップのタイルレイヤーの指定
-    const tileUrl = "https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png";
+    const tileUrl = "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png";
 
     //マップの初期の状態の設定
     const tileLayerOptions = {
