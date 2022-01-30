@@ -18,6 +18,7 @@
     import { convertScales_for_past } from "./convertScales_for_past"
     import moment from 'moment';
     import { onMount } from "svelte";
+    
 
 
 
@@ -303,7 +304,7 @@
         log = apiHttps.responseText;
         Rjson = JSON.parse(log);
 
-        
+
 
         const lastQuake = new XMLHttpRequest();
         lastQuake.open("GET", "https://api.p2pquake.net/v2/jma/quake?limit=10&quake_type=DetailScale", false);
@@ -1213,7 +1214,7 @@
         .parent{
             height:1620px;
             width:calc(100vw - 32px);
-            grid-template-rows: 150px 140px 400px 350px 280px 280px;
+            grid-template-rows: 150px 120px 400px 350px 280px 280px;
             grid-template-columns: 100%;
         }   
     }
@@ -1359,7 +1360,7 @@
         margin-left:10px;
         position:relative;
     }
-    @media (max-width: 640px){
+    @media (max-width: 930px){
         .EEW-detection-right{
             height:100px;
         }
