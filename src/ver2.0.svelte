@@ -17,9 +17,7 @@
     import {LeafletMap, Icon, Marker, TileLayer} from 'svelte-leafletjs';
     import { convertScales_for_past } from "./convertScales_for_past"
     import moment from 'moment';
-    import { onMount } from "svelte";
-    
-
+    import { onDestroy, onMount } from "svelte";
 
 
     const get = () => {
@@ -550,14 +548,14 @@
     //過去の地震情報のはじめの子要素削除
     let changed;
     onMount(() => {
-        if(Rjson[0].earthquake.time == lastQuakeJson[0].earthquake.time){
+        if(Rjson[0].earthquake.time == lastQuakeJson[0].earthquake.time && Rjson[0].earthquake.hypocenter.name == lastQuakeJson[0].earthquake.hypocenter.name){
             const RecentQuake = document.getElementById("RecentQuake")
             const firstChild = RecentQuake.firstChild
             firstChild.remove()
             changed = true
         }
         setInterval(function(){
-            if(Rjson[0].earthquake.time == lastQuakeJson[0].earthquake.time && changed !== true){
+            if(Rjson[0].earthquake.time == lastQuakeJson[0].earthquake.time && Rjson[0].earthquake.hypocenter.name == lastQuakeJson[0].earthquake.hypocenter.name && changed !== true){
                 const RecentQuake = document.getElementById("RecentQuake")
                 const firstChild = RecentQuake.firstChild
                 firstChild.remove()
@@ -962,7 +960,7 @@
                 <div class="recent-quake-right-info-tsunami recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-tsunami-title-ja recent-quake-right-info-contents-title-ja">津波</div>
                     <div class="recent-quake-right-info-tsunami-title-en recent-quake-right-info-contents-title-en">possibility of tsunami</div>
-                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{Rjson[r].earthquake.domesticTsunami_ja}</div>
+                    <div class="recent-quake-right-info-tsunami-tsunami recent-quake-right-info-contents-content">{domesticTsunami[Rjson[r].earthquake.domesticTsunami]}</div>
                 </div>
                 <div class="recent-quake-right-info-area recent-quake-right-info-contents">
                     <div class="recent-quake-right-info-area-title-ja recent-quake-right-info-contents-title-ja">各地の震度</div>
